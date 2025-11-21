@@ -1,0 +1,55 @@
+{% extends "quiz_layout.html" %}
+
+{% block quiz_content %}
+<div class="results-container">
+    <div class="result-header">
+        <h2>Your Result: Growth Marketer</h2>
+        <p>You are focused on scaling and rapid experimentation.</p>
+    </div>
+
+    <div class="result-body">
+        <p>Based on your answers, we recommend focusing on high-leverage channels like paid social and content
+            partnerships.</p>
+
+        <div class="cta-section">
+            <h3>Ready to scale?</h3>
+            <a href="#" class="btn btn-primary btn-lg">Book a Strategy Call</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .results-container {
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    .result-header {
+        margin-bottom: 3rem;
+    }
+
+    .result-header h2 {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .result-body {
+        max-width: 600px;
+        margin: 0 auto;
+        font-size: 1.125rem;
+        line-height: 1.75;
+    }
+
+    .cta-section {
+        margin-top: 3rem;
+        padding: 2rem;
+        background: #f1f5f9;
+        border-radius: 0.5rem;
+    }
+
+    .cta-section h3 {
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}

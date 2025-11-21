@@ -1,0 +1,77 @@
+{% extends "admin_layout.html" %}
+
+{% block admin_content %}
+<div class="analytics-container">
+    <h2>Analytics Overview</h2>
+
+    <div class="analytics-grid">
+        <div class="card">
+            <h3>Lead Growth</h3>
+            <div class="chart-placeholder">
+                <!-- In a real app, we'd use Chart.js or similar here -->
+                <div class="bar" style="height: 40%"></div>
+                <div class="bar" style="height: 60%"></div>
+                <div class="bar" style="height: 30%"></div>
+                <div class="bar" style="height: 80%"></div>
+                <div class="bar" style="height: 50%"></div>
+            </div>
+            <p class="chart-label">Last 5 Days</p>
+        </div>
+
+        <div class="card">
+            <h3>Top Performing Quizzes</h3>
+            <ul class="top-list">
+                {% for quiz in top_quizzes %}
+                <li>
+                    <span class="quiz-name">{{ quiz.name }}</span>
+                    <span class="lead-count">{{ quiz.lead_count }} leads</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .chart-placeholder {
+        height: 200px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
+
+    .bar {
+        width: 40px;
+        background-color: var(--primary-color);
+        border-radius: 4px 4px 0 0;
+        opacity: 0.8;
+    }
+
+    .top-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .top-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .lead-count {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %}

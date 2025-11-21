@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="quiz-layout">
+    <div class="quiz-container">
+        {% if quiz_title %}
+        <header class="quiz-header">
+            <h2>{{ quiz_title }}</h2>
+            {% if show_progress %}
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ progress_percentage }}%"></div>
+            </div>
+            {% endif %}
+        </header>
+        {% endif %}
+
+        <main class="quiz-content">
+            {% block quiz_content %}{% endblock %}
+        </main>
+
+        {% if show_footer %}
+        <footer class="quiz-footer">
+            <p>{{ footer_text }}</p>
+        </footer>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

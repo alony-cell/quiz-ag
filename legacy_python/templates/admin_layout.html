@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <nav>
+            <ul>
+                <li><a href="/admin/dashboard">Dashboard</a></li>
+                <li><a href="/admin/analytics">Analytics</a></li>
+                <li><a href="/admin/quizzes">Quizzes</a></li>
+                <li><a href="/admin/leads">Leads</a></li>
+                <li><a href="/admin/settings">Settings</a></li>
+            </ul>
+        </nav>
+    </aside>
+    <main class="admin-content">
+        {% block admin_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}

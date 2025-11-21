@@ -1,0 +1,56 @@
+{% extends "admin_layout.html" %}
+
+{% block admin_content %}
+<div class="editor-header">
+    <h2>Questions for {{ quiz.name }}</h2>
+    <div>
+        <a href="/admin/quizzes/{{ quiz.slug }}/questions/new" class="btn btn-primary">Add Question</a>
+        <a href="/admin/dashboard" class="btn btn-outline">Back to Dashboard</a>
+    </div>
+</div>
+
+<div class="question-list">
+    {% if questions %}
+    {% for question in questions %}
+    <div class="card question-card">
+        <div class="card-header">
+            <span class="badge">Order: {{ question.question_order }}</span>
+            <h4>{{ question.question_text }}</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Type:</strong> {{ question.question_type }}</p>
+            <ul>
+                {% for answer in question.answers %}
+                <li>{{ answer.label }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="card-footer">
+            <a href="#" class="btn btn-sm btn-outline">Edit</a>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>No questions found.</p>
+    {% endif %}
+</div>
+
+<style>
+    .editor-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .question-card {
+        margin-bottom: 1rem;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+</style>
+{% endblock %}

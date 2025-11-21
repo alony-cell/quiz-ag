@@ -1,0 +1,140 @@
+{% extends "admin_layout.html" %}
+
+{% block admin_content %}
+<div class="dashboard-header">
+    <h2>Dashboard</h2>
+    <div class="stats-summary">
+        <div class="stat-card">
+            <span class="stat-value">{{ total_quizzes }}</span>
+            <span class="stat-label">Quizzes</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">{{ total_leads }}</span>
+            <span class="stat-label">Leads Captured</span>
+        </div>
+    </div>
+    <a href="/admin/quizzes/new" class="btn btn-primary">Create New Quiz</a>
+</div>
+
+<style>
+    .stats-summary {
+        display: flex;
+        gap: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1rem 2rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--border-color);
+        text-align: center;
+    }
+
+    .stat-value {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+</style>
+
+
+<div class="quiz-list">
+    <h3>Your Quizzes</h3>
+    {% if quizzes %}
+    <div class="grid-container">
+        {% for quiz in quizzes %}
+        <div class="card quiz-card">
+            <div class="card-header">
+                <h4>{{ quiz.name }}</h4>
+                <span class="badge {{ 'active' if quiz.is_active else 'inactive' }}">
+                    {{ 'Active' if quiz.is_active else 'Inactive' }}
+                </span>
+            </div>
+            <div class="card-body">
+                <p>{{ quiz.description }}</p>
+            </div>
+            <div class="card-footer">
+                <a href="/admin/quizzes/{{ quiz.slug }}/edit" class="btn btn-sm btn-outline">Edit Settings</a>
+                <a href="/admin/quizzes/{{ quiz.slug }}/questions" class="btn btn-sm btn-outline">Manage Questions</a>
+                <a href="/quiz/{{ quiz.slug }}" target="_blank" class="btn btn-sm btn-outline">Preview</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No quizzes found. Create one to get started!</p>
+    {% endif %}
+</div>
+
+<style>
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .card {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+    }
+
+    .card-header h4 {
+        margin: 0;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .badge.active {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .card-footer {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-outline {
+        border: 1px solid var(--border-color);
+        background: transparent;
+    }
+
+    .btn-outline:hover {
+        background: var(--background-color);
+    }
+</style>
+{% endblock %}
