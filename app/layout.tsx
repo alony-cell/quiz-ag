@@ -5,11 +5,13 @@ import "./globals.css";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -25,7 +27,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${outfit.variable} antialiased font-sans bg-slate-50 text-slate-900`}
+        className={[inter.variable, outfit.variable, "antialiased", "font-sans", "bg-slate-50", "text-slate-900"].join(" ")}
+        suppressHydrationWarning
       >
         {children}
       </body>

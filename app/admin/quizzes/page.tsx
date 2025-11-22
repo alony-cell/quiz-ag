@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { getQuizzes, deleteQuiz } from '@/app/actions/quiz';
-import { Plus, FileText, MoreVertical, ExternalLink, Trash2, Edit } from 'lucide-react';
+import { Plus, FileText, MoreVertical, ExternalLink, Edit } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
+import DeleteQuizButton from '@/components/admin/DeleteQuizButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,21 +93,7 @@ export default async function QuizzesPage() {
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </Link>
-                                            <form action={handleDelete}>
-                                                <input type="hidden" name="id" value={quiz.id} />
-                                                <button
-                                                    type="submit"
-                                                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                    title="Delete Quiz"
-                                                    onClick={(e) => {
-                                                        if (!confirm('Are you sure you want to delete this quiz?')) {
-                                                            e.preventDefault();
-                                                        }
-                                                    }}
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </form>
+                                            <DeleteQuizButton quizId={quiz.id} onDelete={handleDelete} />
                                         </div>
                                     </td>
                                 </tr>
