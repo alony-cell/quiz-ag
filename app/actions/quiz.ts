@@ -73,7 +73,8 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
         console.log('saveQuiz called with:', {
             id: quizData.id,
             questionsCount: quizData.questions?.length,
-            isActive: quizData.isActive
+            isActive: quizData.isActive,
+            firstQuestion: quizData.questions?.[0]
         });
         // 1. Upsert Quiz
         const slug = quizData.slug || generateSlug(quizData.title || 'untitled-quiz');
@@ -100,13 +101,24 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
 
         if (!savedQuiz) throw new Error('Failed to save quiz');
 
+        console.log('Quiz saved, now deleting old questions...');
+
         // 2. Delete existing questions (simple strategy for now: replace all)
         if (quizData.id) {
             await db.delete(questions).where(eq(questions.quizId, quizData.id));
         }
 
+        console.log('Old questions deleted, inserting new questions...');
+
         // 3. Insert new questions
         if (quizData.questions && quizData.questions.length > 0) {
+            console.log('Inserting questions:', quizData.questions.map(q => ({
+                id: q.id,
+                text: q.text,
+                type: q.type,
+                isActive: q.isActive
+            })));
+
             await db.insert(questions).values(
                 quizData.questions.map((q, index) => ({
                     id: q.id,
@@ -118,12 +130,14 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
                     order: index, // Ensure order is preserved
                     options: q.options,
                     structure: q.structure,
-                    isRequired: q.isRequired,
-                    allowBack: q.allowBack,
+                    isRequired: q.isRequired ?? true,
+                    allowBack: q.allowBack ?? false,
                     buttonText: q.buttonText,
-                    isActive: q.isActive ?? true,
+                    isActive: q.isActive !== undefined ? q.isActive : true, // Ensure isActive is always set
                 }))
             );
+
+            console.log('Questions inserted successfully');
         }
 
         // 4. Handle Thank You Pages
@@ -150,9 +164,12 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
         revalidatePath('/admin/quizzes');
         revalidatePath(`/admin/quizzes/${savedQuiz.id}`);
 
+        console.log('Save completed successfully');
         return { success: true, quizId: savedQuiz.id };
     } catch (error) {
-        console.error('Failed to save quiz:', error);
+        console.error('Failed to save quiz - ERROR DETAILS:', error);
+        console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+        console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
         return { success: false, error: 'Failed to save quiz' };
     }
 }
