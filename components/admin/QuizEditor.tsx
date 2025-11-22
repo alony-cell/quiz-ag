@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Save, ArrowLeft, Loader2 } from 'lucide-react';
+import { Save, ArrowLeft, Loader2, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Quiz } from '@/types';
+import { Quiz, Question } from '@/types';
 import { saveQuiz } from '@/app/actions/quiz';
+import QuestionEditor from '@/components/admin/QuestionEditor';
 
 interface QuizEditorProps {
     initialData?: Partial<Quiz>;
@@ -15,24 +16,25 @@ interface QuizEditorProps {
 export default function QuizEditor({ initialData, isNew = false }: QuizEditorProps) {
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
+    const [questions, setQuestions] = useState<Question[]>(initialData?.questions || []);
     const [formData, setFormData] = useState<Partial<Quiz>>({
         title: '',
         slug: '',
         description: '',
         isActive: false,
         ...initialData,
+        // ensure questions are not duplicated in formData
+        questions: undefined,
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSaving(true);
-
         try {
             const result = await saveQuiz({
                 ...formData,
-                questions: formData.questions || [],
+                questions,
             });
-
             if (result.success && result.quizId) {
                 router.push(`/admin/quizzes/${result.quizId}`);
             }
@@ -44,14 +46,39 @@ export default function QuizEditor({ initialData, isNew = false }: QuizEditorPro
         }
     };
 
+    const addQuestion = () => {
+        setQuestions(prev => [
+            ...prev,
+            {
+                id: crypto.randomUUID(),
+                quizId: formData.id || '',
+                text: '',
+                description: '',
+                imageUrl: '',
+                type: 'multiple_choice',
+                order: prev.length,
+                options: [],
+                structure: [],
+                isRequired: true,
+                allowBack: false,
+                buttonText: '',
+            } as Question,
+        ]);
+    };
+
+    const updateQuestion = (index: number, updated: Partial<Question>) => {
+        setQuestions(prev => {
+            const copy = [...prev];
+            copy[index] = { ...copy[index], ...updated } as Question;
+            return copy;
+        });
+    };
+
     return (
         <div className="max-w-2xl mx-auto">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center">
-                    <Link
-                        href="/admin/dashboard"
-                        className="mr-4 text-gray-500 hover:text-gray-700"
-                    >
+                    <Link href="/admin/dashboard" className="mr-4 text-gray-500 hover:text-gray-700">
                         <ArrowLeft className="w-6 h-6" />
                     </Link>
                     <h1 className="text-2xl font-bold text-gray-900">
@@ -71,13 +98,11 @@ export default function QuizEditor({ initialData, isNew = false }: QuizEditorPro
             <div className="p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Quiz Title
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">Quiz Title</label>
                         <input
                             type="text"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            value={formData.title || ''}
+                            onChange={e => setFormData({ ...formData, title: e.target.value })}
                             className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                             placeholder="e.g., Marketing Strategy Quiz"
                             required
@@ -85,17 +110,13 @@ export default function QuizEditor({ initialData, isNew = false }: QuizEditorPro
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            URL Slug
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">URL Slug</label>
                         <div className="flex mt-1 rounded-md shadow-sm">
-                            <span className="inline-flex items-center px-3 text-gray-500 border border-r-0 border-gray-300 bg-gray-50 rounded-l-md sm:text-sm">
-                                /quiz/
-                            </span>
+                            <span className="inline-flex items-center px-3 text-gray-500 border border-r-0 border-gray-300 bg-gray-50 rounded-l-md sm:text-sm">/quiz/</span>
                             <input
                                 type="text"
-                                value={formData.slug}
-                                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                                value={formData.slug || ''}
+                                onChange={e => setFormData({ ...formData, slug: e.target.value })}
                                 className="flex-1 block w-full min-w-0 border-gray-300 rounded-none focus:border-blue-500 focus:ring-blue-500 rounded-r-md sm:text-sm"
                                 placeholder="marketing-strategy"
                                 required
@@ -104,12 +125,10 @@ export default function QuizEditor({ initialData, isNew = false }: QuizEditorPro
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Description
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">Description</label>
                         <textarea
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            value={formData.description || ''}
+                            onChange={e => setFormData({ ...formData, description: e.target.value })}
                             rows={4}
                             className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                             placeholder="Briefly describe what this quiz is about..."
@@ -120,13 +139,32 @@ export default function QuizEditor({ initialData, isNew = false }: QuizEditorPro
                         <input
                             id="isActive"
                             type="checkbox"
-                            checked={formData.isActive}
-                            onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                            checked={formData.isActive || false}
+                            onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
                             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
-                        <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
-                            Active (visible to public)
-                        </label>
+                        <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">Active (visible to public)</label>
+                    </div>
+
+                    {/* Questions Section */}
+                    <div className="space-y-6">
+                        <h2 className="text-xl font-semibold text-gray-800">Questions</h2>
+                        {questions.map((q, idx) => (
+                            <QuestionEditor
+                                key={q.id}
+                                initialQuestion={q}
+                                onSave={updated => updateQuestion(idx, updated)}
+                                onCancel={() => { }}
+                            />
+                        ))}
+                        <button
+                            type="button"
+                            onClick={addQuestion}
+                            className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                        >
+                            <Plus className="w-4 h-4 mr-1" />
+                            Add Question
+                        </button>
                     </div>
                 </form>
             </div>
