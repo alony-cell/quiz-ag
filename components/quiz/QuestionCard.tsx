@@ -98,8 +98,8 @@ export default function QuestionCard({
             };
         }
         return {
-            borderColor: 'transparent', // Or slate-200 if we want border by default
-            backgroundColor: design.elements?.answers?.backgroundColor || 'transparent',
+            borderColor: design.elements?.answers?.borderColor || undefined,
+            backgroundColor: design.elements?.answers?.backgroundColor || undefined,
             color: design.elements?.answers?.textColor || design.colors.text,
             borderRadius: baseRadius,
         };
@@ -225,7 +225,7 @@ export default function QuestionCard({
                                                 : [...current, option.value];
                                             onSelectionChange?.(newSelection);
                                         }}
-                                        className={`w-full p-4 text-left border-2 transition-all flex items-center justify-between group ${isSelected
+                                        className={`w-full p-4 text-left border-2 transition-all flex items-center justify-between group bg-white ${isSelected
                                             ? 'border-blue-500'
                                             : 'border-slate-200 hover:border-blue-300'
                                             }`}
@@ -278,7 +278,7 @@ export default function QuestionCard({
                                     <button
                                         key={option.value}
                                         onClick={() => handleSingleChoiceSelection(option.value)}
-                                        className={`w-full p-4 text-left border-2 transition-all group ${isSelected
+                                        className={`w-full p-4 text-left border-2 transition-all group bg-white ${isSelected
                                             ? 'border-blue-500'
                                             : 'border-slate-200 hover:border-blue-300'
                                             }`}

@@ -69,6 +69,7 @@ export interface DesignConfig {
         answers?: {
             backgroundColor?: string;
             textColor?: string;
+            borderColor?: string;
             hoverColor?: string;
             selectedColor?: string;
             borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
