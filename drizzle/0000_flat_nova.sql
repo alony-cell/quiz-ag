@@ -20,6 +20,7 @@ CREATE TABLE "questions" (
 	"structure" jsonb,
 	"is_required" boolean DEFAULT true,
 	"allow_back" boolean DEFAULT false,
+	"is_active" boolean DEFAULT true NOT NULL,
 	"button_text" text,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );

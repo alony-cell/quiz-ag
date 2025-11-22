@@ -24,6 +24,7 @@ export const questions = pgTable('questions', {
     structure: jsonb('structure'), // Store layout structure as JSON
     isRequired: boolean('is_required').default(true),
     allowBack: boolean('allow_back').default(false),
+    isActive: boolean('is_active').default(true).notNull(),
     buttonText: text('button_text'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });

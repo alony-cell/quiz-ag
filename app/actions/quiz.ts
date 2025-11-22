@@ -68,6 +68,11 @@ export async function getQuizBySlug(slug: string) {
 
 export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[] }) {
     try {
+        console.log('saveQuiz called with:', {
+            id: quizData.id,
+            questionsCount: quizData.questions?.length,
+            isActive: quizData.isActive
+        });
         // 1. Upsert Quiz
         const slug = quizData.slug || generateSlug(quizData.title || 'untitled-quiz');
 
@@ -114,6 +119,7 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
                     isRequired: q.isRequired,
                     allowBack: q.allowBack,
                     buttonText: q.buttonText,
+                    isActive: q.isActive ?? true,
                 }))
             );
         }
