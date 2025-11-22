@@ -60,6 +60,7 @@ export default function QuizEditor({ initialData, isNew = false }: QuizEditorPro
                 options: [],
                 structure: [],
                 isRequired: true,
+                isActive: true,
                 allowBack: false,
                 buttonText: '',
             } as Question,
