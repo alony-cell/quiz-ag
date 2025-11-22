@@ -1,13 +1,16 @@
 import { BarChart3, TrendingUp, Users, MousePointerClick } from 'lucide-react';
+import { getGlobalStats } from '@/app/actions/analytics';
 
-const analyticsStats = [
-    { label: 'Total Views', value: '12,450', change: '+12%', icon: Users, color: 'text-blue-600' },
-    { label: 'Completion Rate', value: '45.2%', change: '+5%', icon: TrendingUp, color: 'text-green-600' },
-    { label: 'Leads Captured', value: '5,630', change: '+18%', icon: MousePointerClick, color: 'text-purple-600' },
-    { label: 'Avg. Time', value: '2m 15s', change: '-2%', icon: BarChart3, color: 'text-orange-600' },
-];
+export default async function AnalyticsPage() {
+    const stats = await getGlobalStats();
 
-export default function AnalyticsPage() {
+    const analyticsStats = [
+        { label: 'Total Quizzes', value: stats.totalQuizzes.toString(), change: 'All time', icon: Users, color: 'text-blue-600' },
+        { label: 'Total Responses', value: stats.totalResponses.toString(), change: 'All time', icon: TrendingUp, color: 'text-green-600' },
+        { label: 'Leads Captured', value: stats.totalLeads.toString(), change: 'All time', icon: MousePointerClick, color: 'text-purple-600' },
+        { label: 'Avg. Time (sec)', value: stats.avgTimeTaken.toString(), change: 'All time', icon: BarChart3, color: 'text-orange-600' },
+    ];
+
     return (
         <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-900">Analytics Overview</h2>
@@ -26,10 +29,7 @@ export default function AnalyticsPage() {
                             </div>
                         </div>
                         <div className="mt-4 flex items-center text-sm">
-                            <span className={stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}>
-                                {stat.change}
-                            </span>
-                            <span className="text-gray-500 ml-2">vs last month</span>
+                            <span className="text-gray-500 ml-2">{stat.change}</span>
                         </div>
                     </div>
                 ))}

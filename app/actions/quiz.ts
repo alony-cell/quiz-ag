@@ -6,6 +6,13 @@ import { eq, desc, asc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { Quiz, Question } from '@/types';
 
+function generateSlug(title: string): string {
+    return title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+}
+
 export async function getQuizzes() {
     try {
         const allQuizzes = await db.query.quizzes.findMany({
@@ -40,12 +47,34 @@ export async function getQuiz(id: string) {
     }
 }
 
+export async function getQuizBySlug(slug: string) {
+    try {
+        const quiz = await db.query.quizzes.findFirst({
+            where: eq(quizzes.slug, slug),
+            with: {
+                questions: {
+                    orderBy: [asc(questions.order)],
+                },
+            },
+        });
+
+        if (!quiz) return null;
+        return quiz;
+    } catch (error) {
+        console.error('Failed to fetch quiz by slug:', error);
+        throw new Error('Failed to fetch quiz by slug');
+    }
+}
+
 export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[] }) {
     try {
         // 1. Upsert Quiz
+        const slug = quizData.slug || generateSlug(quizData.title || 'untitled-quiz');
+
         const [savedQuiz] = await db.insert(quizzes).values({
             id: quizData.id,
             title: quizData.title || 'Untitled Quiz',
+            slug: slug,
             description: quizData.description,
             design: quizData.design,
             isActive: quizData.isActive ?? true,
@@ -54,6 +83,7 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
             target: quizzes.id,
             set: {
                 title: quizData.title,
+                slug: slug, // Update slug if title changes? Maybe optional. For now, yes.
                 description: quizData.description,
                 design: quizData.design,
                 isActive: quizData.isActive,

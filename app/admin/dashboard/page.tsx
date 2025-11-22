@@ -1,20 +1,18 @@
 import Link from 'next/link';
 import { Plus, Users, FileText, TrendingUp, ArrowUpRight } from 'lucide-react';
+import { getQuizzes } from '@/app/actions/quiz';
+import { getGlobalStats } from '@/app/actions/analytics';
 
-// Mock Data (Temporary)
-const stats = [
-    { label: 'Total Quizzes', value: '12', icon: FileText, color: 'bg-blue-500', trend: '+2 this week' },
-    { label: 'Total Leads', value: '1,234', icon: Users, color: 'bg-indigo-500', trend: '+12% vs last month' },
-    { label: 'Active Quizzes', value: '8', icon: TrendingUp, color: 'bg-emerald-500', trend: 'Stable' },
-];
+export default async function DashboardPage() {
+    const quizzes = await getQuizzes();
+    const stats = await getGlobalStats();
 
-const recentQuizzes = [
-    { id: '1', title: 'Marketing Strategy Quiz', leads: 450, status: 'Active', date: '2 days ago' },
-    { id: '2', title: 'Product Fit Quiz', leads: 120, status: 'Draft', date: '5 days ago' },
-    { id: '3', title: 'Personality Test', leads: 890, status: 'Active', date: '1 week ago' },
-];
+    const dashboardStats = [
+        { label: 'Total Quizzes', value: stats.totalQuizzes.toString(), icon: FileText, color: 'bg-blue-500', trend: 'All time' },
+        { label: 'Total Leads', value: stats.totalLeads.toString(), icon: Users, color: 'bg-indigo-500', trend: 'All time' },
+        { label: 'Total Responses', value: stats.totalResponses.toString(), icon: TrendingUp, color: 'bg-emerald-500', trend: 'All time' },
+    ];
 
-export default function DashboardPage() {
     return (
         <div className="space-y-8">
             <div className="flex items-center justify-between">
@@ -33,7 +31,7 @@ export default function DashboardPage() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                {stats.map((stat) => (
+                {dashboardStats.map((stat) => (
                     <div key={stat.label} className="glass-card p-6 rounded-2xl">
                         <div className="flex items-start justify-between">
                             <div>
@@ -62,7 +60,7 @@ export default function DashboardPage() {
                     </Link>
                 </div>
                 <div className="divide-y divide-slate-100">
-                    {recentQuizzes.map((quiz) => (
+                    {quizzes.slice(0, 5).map((quiz) => (
                         <div key={quiz.id} className="flex items-center justify-between px-8 py-5 hover:bg-slate-50/50 transition-colors">
                             <div className="flex items-center space-x-4">
                                 <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
@@ -70,17 +68,19 @@ export default function DashboardPage() {
                                 </div>
                                 <div>
                                     <h4 className="font-semibold text-slate-900">{quiz.title}</h4>
-                                    <p className="text-sm text-slate-500">{quiz.leads} leads captured • {quiz.date}</p>
+                                    <p className="text-sm text-slate-500">
+                                        {new Date(quiz.updatedAt).toLocaleDateString()}
+                                    </p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-6">
                                 <span
-                                    className={`px-3 py-1 text-xs font-medium rounded-full border ${quiz.status === 'Active'
+                                    className={`px-3 py-1 text-xs font-medium rounded-full border ${quiz.isActive
                                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                         : 'bg-slate-100 text-slate-600 border-slate-200'
                                         }`}
                                 >
-                                    {quiz.status}
+                                    {quiz.isActive ? 'Active' : 'Draft'}
                                 </span>
                                 <Link
                                     href={`/admin/quizzes/${quiz.id}`}
@@ -91,6 +91,11 @@ export default function DashboardPage() {
                             </div>
                         </div>
                     ))}
+                    {quizzes.length === 0 && (
+                        <div className="p-8 text-center text-slate-500">
+                            No quizzes found. Create one to get started!
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
