@@ -85,3 +85,22 @@ export async function getGlobalStats() {
         return { totalResponses: 0, avgTimeTaken: 0, totalLeads: 0, totalQuizzes: 0 };
     }
 }
+
+export async function getAllLeads() {
+    try {
+        const allLeads = await db.query.leads.findMany({
+            with: {
+                quiz: {
+                    columns: {
+                        title: true,
+                    }
+                }
+            },
+            orderBy: [desc(leads.createdAt)],
+        });
+        return allLeads;
+    } catch (error) {
+        console.error('Failed to fetch all leads:', error);
+        return [];
+    }
+}

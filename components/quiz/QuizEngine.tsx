@@ -8,6 +8,8 @@ import LeadForm from './LeadForm';
 import ResultsView from './ResultsView';
 import QuestionCard from './QuestionCard';
 
+import { submitResponse } from '@/app/actions/response';
+
 interface QuizEngineProps {
     quiz: Quiz;
 }
@@ -18,6 +20,7 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
     const [quizState, setQuizState] = useState<'question' | 'lead_capture' | 'results'>('question');
     const [textAnswer, setTextAnswer] = useState('');
     const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({});
+    const [startTime] = useState(Date.now());
 
     const questions = quiz.questions || [];
     const currentQuestion = questions[currentStep];
@@ -35,8 +38,19 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
         }
     };
 
-    const handleLeadSubmit = (data: { email: string; firstName?: string }) => {
-        console.log('Lead captured:', data);
+    const handleLeadSubmit = async (data: { email: string; firstName?: string }) => {
+        const timeTaken = Math.round((Date.now() - startTime) / 1000);
+
+        await submitResponse({
+            quizId: quiz.id,
+            answers,
+            timeTaken,
+            lead: {
+                email: data.email,
+                name: data.firstName,
+            }
+        });
+
         setQuizState('results');
     };
 
