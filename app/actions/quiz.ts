@@ -120,21 +120,26 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
             })));
 
             await db.insert(questions).values(
-                quizData.questions.map((q, index) => ({
-                    id: q.id,
-                    quizId: savedQuiz.id,
-                    text: q.text,
-                    description: q.description,
-                    imageUrl: q.imageUrl,
-                    type: q.type,
-                    order: index, // Ensure order is preserved
-                    options: q.options,
-                    structure: q.structure,
-                    isRequired: q.isRequired ?? true,
-                    allowBack: q.allowBack ?? false,
-                    buttonText: q.buttonText,
-                    isActive: q.isActive !== undefined ? q.isActive : true, // Ensure isActive is always set
-                }))
+                quizData.questions.map((q, index) => {
+                    // Ensure a valid UUID for the question ID; if the client provided an invalid ID, generate a new one
+                    const isValidUuid = typeof q.id === 'string' && /^[0-9a-fA-F-]{36}$/.test(q.id);
+                    const questionId = isValidUuid ? q.id : crypto.randomUUID();
+                    return {
+                        id: questionId,
+                        quizId: savedQuiz.id,
+                        text: q.text,
+                        description: q.description,
+                        imageUrl: q.imageUrl,
+                        type: q.type,
+                        order: index, // Ensure order is preserved
+                        options: q.options,
+                        structure: q.structure,
+                        isRequired: q.isRequired ?? true,
+                        allowBack: q.allowBack ?? false,
+                        buttonText: q.buttonText,
+                        isActive: q.isActive !== undefined ? q.isActive : true, // Ensure isActive is always set
+                    };
+                })
             );
 
             console.log('Questions inserted successfully');
