@@ -51,6 +51,30 @@ export interface DesignConfig {
         opacity?: number;
         spacing?: 'compact' | 'comfortable' | 'spacious';
     };
+    elements?: {
+        title?: {
+            color?: string;
+            fontSize?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+            alignment?: 'left' | 'center' | 'right';
+        };
+        description?: {
+            color?: string;
+            fontSize?: 'sm' | 'md' | 'lg';
+            alignment?: 'left' | 'center' | 'right';
+        };
+        answers?: {
+            backgroundColor?: string;
+            textColor?: string;
+            hoverColor?: string;
+            selectedColor?: string;
+            borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+        };
+        buttons?: {
+            backgroundColor?: string;
+            textColor?: string;
+            borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+        };
+    };
     backgroundImage?: string;
 }
 

@@ -63,7 +63,46 @@ export default function QuestionCard({
             design.typography.headingFont === 'inter' ? 'var(--font-inter)' :
                 design.typography.headingFont === 'poppins' ? 'Poppins, sans-serif' :
                     design.typography.headingFont,
-        color: design.colors.text,
+        color: design.elements?.title?.color || design.colors.text,
+        textAlign: design.elements?.title?.alignment || 'left',
+    };
+
+    const descriptionStyle = {
+        color: design.elements?.description?.color || design.colors.text,
+        textAlign: design.elements?.description?.alignment || 'left',
+    };
+
+    const getButtonStyle = () => ({
+        backgroundColor: design.elements?.buttons?.backgroundColor || design.colors.primary,
+        color: design.elements?.buttons?.textColor || '#ffffff',
+        borderRadius: design.elements?.buttons?.borderRadius === 'full' ? '9999px' :
+            design.elements?.buttons?.borderRadius === 'xl' ? '1rem' :
+                design.elements?.buttons?.borderRadius === 'lg' ? '0.75rem' :
+                    design.elements?.buttons?.borderRadius === 'md' ? '0.5rem' :
+                        design.elements?.buttons?.borderRadius === 'sm' ? '0.25rem' : '0',
+    });
+
+    const getAnswerStyle = (isSelected: boolean) => {
+        const baseRadius = design.elements?.answers?.borderRadius === 'full' ? '9999px' :
+            design.elements?.answers?.borderRadius === 'xl' ? '1rem' :
+                design.elements?.answers?.borderRadius === 'lg' ? '0.75rem' :
+                    design.elements?.answers?.borderRadius === 'md' ? '0.5rem' :
+                        design.elements?.answers?.borderRadius === 'sm' ? '0.25rem' : '0';
+
+        if (isSelected) {
+            return {
+                borderColor: design.colors.primary,
+                backgroundColor: design.elements?.answers?.selectedColor || `${design.colors.primary}10`,
+                color: design.colors.text,
+                borderRadius: baseRadius,
+            };
+        }
+        return {
+            borderColor: 'transparent', // Or slate-200 if we want border by default
+            backgroundColor: design.elements?.answers?.backgroundColor || 'transparent',
+            color: design.elements?.answers?.textColor || design.colors.text,
+            borderRadius: baseRadius,
+        };
     };
 
     const handleSingleChoiceSelection = (value: string) => {
@@ -131,7 +170,7 @@ export default function QuestionCard({
 
             case 'description':
                 return question.description ? (
-                    <p key="description" className="text-lg mb-6 opacity-80" style={{ color: design.colors.text }}>
+                    <p key="description" className="text-lg mb-6 opacity-80" style={descriptionStyle}>
                         {question.description}
                     </p>
                 ) : null;
@@ -154,56 +193,58 @@ export default function QuestionCard({
                                     className="w-full p-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all text-lg"
                                     placeholder="Type your answer here..."
                                     autoFocus
+                                    style={{
+                                        borderRadius: design.elements?.answers?.borderRadius === 'full' ? '1.5rem' : undefined
+                                    }}
                                 />
                             </form>
                         ) : question.type === 'multi_select' ? (
-                            question.options?.map((option) => (
-                                <button
-                                    key={option.value}
-                                    onClick={() => {
-                                        const current = selectedOptions || [];
-                                        const isSelected = current.includes(option.value);
-                                        const newSelection = isSelected
-                                            ? current.filter(v => v !== option.value)
-                                            : [...current, option.value];
-                                        onSelectionChange?.(newSelection);
-                                    }}
-                                    className={`w-full p-4 text-left rounded-xl border-2 transition-all flex items-center justify-between group ${(selectedOptions || []).includes(option.value)
-                                        ? 'border-blue-500 bg-blue-50/50'
-                                        : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50/50'
-                                        }`}
-                                    style={{
-                                        borderColor: (selectedOptions || []).includes(option.value) ? design.colors.primary : undefined,
-                                        backgroundColor: (selectedOptions || []).includes(option.value) ? `${design.colors.primary}10` : undefined,
-                                    }}
-                                >
-                                    <span className="font-medium text-lg" style={fontStyle}>{option.label}</span>
-                                    {(selectedOptions || []).includes(option.value) && (
-                                        <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: design.colors.primary }}>
-                                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </div>
-                                    )}
-                                </button>
-                            ))
+                            question.options?.map((option) => {
+                                const isSelected = (selectedOptions || []).includes(option.value);
+                                return (
+                                    <button
+                                        key={option.value}
+                                        onClick={() => {
+                                            const current = selectedOptions || [];
+                                            const newSelection = isSelected
+                                                ? current.filter(v => v !== option.value)
+                                                : [...current, option.value];
+                                            onSelectionChange?.(newSelection);
+                                        }}
+                                        className={`w-full p-4 text-left border-2 transition-all flex items-center justify-between group ${isSelected
+                                            ? 'border-blue-500'
+                                            : 'border-slate-200 hover:border-blue-300'
+                                            }`}
+                                        style={getAnswerStyle(isSelected)}
+                                    >
+                                        <span className="font-medium text-lg" style={fontStyle}>{option.label}</span>
+                                        {isSelected && (
+                                            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: design.colors.primary }}>
+                                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                        )}
+                                    </button>
+                                );
+                            })
                         ) : (
-                            question.options?.map((option) => (
-                                <button
-                                    key={option.value}
-                                    onClick={() => handleSingleChoiceSelection(option.value)}
-                                    className={`w-full p-4 text-left rounded-xl border-2 transition-all group ${(selectedOptions || []).includes(option.value)
-                                        ? 'border-blue-500 bg-blue-50/50'
-                                        : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50/50'
-                                        }`}
-                                    style={{
-                                        borderColor: (selectedOptions || []).includes(option.value) ? design.colors.primary : undefined,
-                                        backgroundColor: (selectedOptions || []).includes(option.value) ? `${design.colors.primary}10` : undefined,
-                                    }}
-                                >
-                                    <span className="font-medium text-lg" style={fontStyle}>{option.label}</span>
-                                </button>
-                            ))
+                            question.options?.map((option) => {
+                                const isSelected = (selectedOptions || []).includes(option.value);
+                                return (
+                                    <button
+                                        key={option.value}
+                                        onClick={() => handleSingleChoiceSelection(option.value)}
+                                        className={`w-full p-4 text-left border-2 transition-all group ${isSelected
+                                            ? 'border-blue-500'
+                                            : 'border-slate-200 hover:border-blue-300'
+                                            }`}
+                                        style={getAnswerStyle(isSelected)}
+                                    >
+                                        <span className="font-medium text-lg" style={fontStyle}>{option.label}</span>
+                                    </button>
+                                );
+                            })
                         )}
                     </div>
                 );
@@ -215,11 +256,8 @@ export default function QuestionCard({
                         <button
                             key="button"
                             onClick={() => onAnswer(question.id, 'continue')}
-                            className="w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg"
-                            style={{
-                                backgroundColor: design.colors.primary,
-                                color: '#ffffff',
-                            }}
+                            className="w-full py-4 px-6 font-semibold text-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg"
+                            style={getButtonStyle()}
                         >
                             {question.buttonText || 'Continue'}
                         </button>
@@ -255,8 +293,8 @@ export default function QuestionCard({
                                     }
                                 }}
                                 disabled={isNextDisabled() && question.isRequired !== false}
-                                className="flex-1 py-3 px-6 rounded-xl font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                style={{ backgroundColor: design.colors.primary }}
+                                className="flex-1 py-3 px-6 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={getButtonStyle()}
                             >
                                 {question.buttonText || (question.type === 'text' ? 'Next' : 'Continue')}
                             </button>
