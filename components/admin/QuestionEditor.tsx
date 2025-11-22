@@ -223,32 +223,136 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                             </label>
                             <div className="space-y-3">
                                 {question.options?.map((option, index) => (
-                                    <div key={index} className="flex gap-3">
-                                        <input
-                                            type="text"
-                                            value={option.label}
-                                            onChange={(e) => {
-                                                const newOptions = [...(question.options || [])];
-                                                newOptions[index] = { ...option, label: e.target.value, value: e.target.value.toLowerCase().replace(/\s+/g, '-') };
-                                                setQuestion({ ...question, options: newOptions });
-                                            }}
-                                            className="flex-1 rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2.5 border"
-                                            placeholder={`Option ${index + 1}`}
-                                        />
-                                        <button
-                                            onClick={() => {
-                                                const newOptions = question.options?.filter((_, i) => i !== index);
-                                                setQuestion({ ...question, options: newOptions });
-                                            }}
-                                            className="p-2 text-slate-400 hover:text-red-500 transition-colors"
-                                        >
-                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
+                                    <div key={index} className="border border-slate-200 rounded-lg p-4 bg-white space-y-3">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-xs font-medium text-slate-500">Option {index + 1}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newOptions = question.options?.filter((_, i) => i !== index);
+                                                    setQuestion({ ...question, options: newOptions });
+                                                }}
+                                                className="p-1 text-slate-400 hover:text-red-500 transition-colors"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="block text-xs font-medium text-slate-600 mb-1">
+                                                    Label (Display Text)
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={option.label}
+                                                    onChange={(e) => {
+                                                        const newOptions = [...(question.options || [])];
+                                                        newOptions[index] = { ...option, label: e.target.value };
+                                                        setQuestion({ ...question, options: newOptions });
+                                                    }}
+                                                    className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 border"
+                                                    placeholder="e.g., Strongly Agree"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-slate-600 mb-1">
+                                                    Value (Data)
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={option.value}
+                                                    onChange={(e) => {
+                                                        const newOptions = [...(question.options || [])];
+                                                        newOptions[index] = { ...option, value: e.target.value };
+                                                        setQuestion({ ...question, options: newOptions });
+                                                    }}
+                                                    className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 border"
+                                                    placeholder="e.g., strongly_agree"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="block text-xs font-medium text-slate-600 mb-1">
+                                                    Icon/Emoji (Optional)
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={option.icon || ''}
+                                                    onChange={(e) => {
+                                                        const newOptions = [...(question.options || [])];
+                                                        newOptions[index] = { ...option, icon: e.target.value };
+                                                        setQuestion({ ...question, options: newOptions });
+                                                    }}
+                                                    className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 border"
+                                                    placeholder="😊 or icon URL"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-slate-600 mb-1">
+                                                    Image URL (Optional)
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={option.imageUrl || ''}
+                                                    onChange={(e) => {
+                                                        const newOptions = [...(question.options || [])];
+                                                        newOptions[index] = { ...option, imageUrl: e.target.value };
+                                                        setQuestion({ ...question, options: newOptions });
+                                                    }}
+                                                    className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 border"
+                                                    placeholder="https://..."
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {(option.imageUrl || option.icon) && (
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                                        Image Size
+                                                    </label>
+                                                    <select
+                                                        value={option.imageSize || 'md'}
+                                                        onChange={(e) => {
+                                                            const newOptions = [...(question.options || [])];
+                                                            newOptions[index] = { ...option, imageSize: e.target.value as 'sm' | 'md' | 'lg' };
+                                                            setQuestion({ ...question, options: newOptions });
+                                                        }}
+                                                        className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 border"
+                                                    >
+                                                        <option value="sm">Small</option>
+                                                        <option value="md">Medium</option>
+                                                        <option value="lg">Large</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                                        Image Position
+                                                    </label>
+                                                    <select
+                                                        value={option.imagePosition || 'left'}
+                                                        onChange={(e) => {
+                                                            const newOptions = [...(question.options || [])];
+                                                            newOptions[index] = { ...option, imagePosition: e.target.value as 'left' | 'right' | 'top' | 'bottom' };
+                                                            setQuestion({ ...question, options: newOptions });
+                                                        }}
+                                                        className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 border"
+                                                    >
+                                                        <option value="left">Left</option>
+                                                        <option value="right">Right</option>
+                                                        <option value="top">Top</option>
+                                                        <option value="bottom">Bottom</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                                 <button
+                                    type="button"
                                     onClick={() => setQuestion({
                                         ...question,
                                         options: [...(question.options || []), { label: '', value: '' }]
@@ -258,6 +362,57 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                                     <Plus className="w-4 h-4 mr-1" />
                                     Add Option
                                 </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {question.type === 'true_false' && (
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-3">
+                                True/False Labels
+                            </label>
+                            <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-600 mb-1">
+                                            True Label
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={question.options?.[0]?.label || 'True'}
+                                            onChange={(e) => {
+                                                const newOptions = [
+                                                    { value: 'true', label: e.target.value },
+                                                    question.options?.[1] || { value: 'false', label: 'False' }
+                                                ];
+                                                setQuestion({ ...question, options: newOptions });
+                                            }}
+                                            className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2.5 border"
+                                            placeholder="True"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-600 mb-1">
+                                            False Label
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={question.options?.[1]?.label || 'False'}
+                                            onChange={(e) => {
+                                                const newOptions = [
+                                                    question.options?.[0] || { value: 'true', label: 'True' },
+                                                    { value: 'false', label: e.target.value }
+                                                ];
+                                                setQuestion({ ...question, options: newOptions });
+                                            }}
+                                            className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2.5 border"
+                                            placeholder="False"
+                                        />
+                                    </div>
+                                </div>
+                                <p className="text-xs text-slate-500">
+                                    Customize the labels shown to users. Values will remain 'true' and 'false' in the data.
+                                </p>
                             </div>
                         </div>
                     )}

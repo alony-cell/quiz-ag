@@ -3,6 +3,10 @@ export type QuestionType = 'multiple_choice' | 'text' | 'true_false' | 'rating' 
 export interface AnswerOption {
     value: string;
     label: string;
+    icon?: string;        // Icon URL or emoji
+    imageUrl?: string;    // Image URL
+    imageSize?: 'sm' | 'md' | 'lg';
+    imagePosition?: 'left' | 'right' | 'top' | 'bottom';
 }
 
 export interface Question {

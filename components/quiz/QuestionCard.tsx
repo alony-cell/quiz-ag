@@ -201,6 +201,20 @@ export default function QuestionCard({
                         ) : question.type === 'multi_select' ? (
                             question.options?.map((option) => {
                                 const isSelected = (selectedOptions || []).includes(option.value);
+                                const hasMedia = option.icon || option.imageUrl;
+                                const imageSize = option.imageSize || 'md';
+                                const imagePosition = option.imagePosition || 'left';
+
+                                const sizeClasses = {
+                                    sm: 'w-6 h-6',
+                                    md: 'w-10 h-10',
+                                    lg: 'w-16 h-16'
+                                };
+
+                                const flexDirection = imagePosition === 'top' ? 'flex-col' :
+                                    imagePosition === 'bottom' ? 'flex-col-reverse' :
+                                        imagePosition === 'right' ? 'flex-row-reverse' : 'flex-row';
+
                                 return (
                                     <button
                                         key={option.value}
@@ -217,9 +231,24 @@ export default function QuestionCard({
                                             }`}
                                         style={getAnswerStyle(isSelected)}
                                     >
-                                        <span className="font-medium text-lg" style={fontStyle}>{option.label}</span>
+                                        <div className={`flex items-center gap-3 ${flexDirection} ${imagePosition === 'top' || imagePosition === 'bottom' ? 'w-full text-center' : ''}`}>
+                                            {hasMedia && (
+                                                <div className={`flex-shrink-0 ${sizeClasses[imageSize]}`}>
+                                                    {option.imageUrl ? (
+                                                        <img
+                                                            src={option.imageUrl}
+                                                            alt={option.label}
+                                                            className={`${sizeClasses[imageSize]} object-cover rounded`}
+                                                        />
+                                                    ) : option.icon ? (
+                                                        <span className="text-2xl">{option.icon}</span>
+                                                    ) : null}
+                                                </div>
+                                            )}
+                                            <span className="font-medium text-lg" style={fontStyle}>{option.label}</span>
+                                        </div>
                                         {isSelected && (
-                                            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: design.colors.primary }}>
+                                            <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: design.colors.primary }}>
                                                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                                 </svg>
@@ -231,6 +260,20 @@ export default function QuestionCard({
                         ) : (
                             question.options?.map((option) => {
                                 const isSelected = (selectedOptions || []).includes(option.value);
+                                const hasMedia = option.icon || option.imageUrl;
+                                const imageSize = option.imageSize || 'md';
+                                const imagePosition = option.imagePosition || 'left';
+
+                                const sizeClasses = {
+                                    sm: 'w-6 h-6',
+                                    md: 'w-10 h-10',
+                                    lg: 'w-16 h-16'
+                                };
+
+                                const flexDirection = imagePosition === 'top' ? 'flex-col' :
+                                    imagePosition === 'bottom' ? 'flex-col-reverse' :
+                                        imagePosition === 'right' ? 'flex-row-reverse' : 'flex-row';
+
                                 return (
                                     <button
                                         key={option.value}
@@ -241,7 +284,22 @@ export default function QuestionCard({
                                             }`}
                                         style={getAnswerStyle(isSelected)}
                                     >
-                                        <span className="font-medium text-lg" style={fontStyle}>{option.label}</span>
+                                        <div className={`flex items-center gap-3 ${flexDirection} ${imagePosition === 'top' || imagePosition === 'bottom' ? 'w-full text-center' : ''}`}>
+                                            {hasMedia && (
+                                                <div className={`flex-shrink-0 ${sizeClasses[imageSize]}`}>
+                                                    {option.imageUrl ? (
+                                                        <img
+                                                            src={option.imageUrl}
+                                                            alt={option.label}
+                                                            className={`${sizeClasses[imageSize]} object-cover rounded`}
+                                                        />
+                                                    ) : option.icon ? (
+                                                        <span className="text-2xl">{option.icon}</span>
+                                                    ) : null}
+                                                </div>
+                                            )}
+                                            <span className="font-medium text-lg" style={fontStyle}>{option.label}</span>
+                                        </div>
                                     </button>
                                 );
                             })
