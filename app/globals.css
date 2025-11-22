@@ -29,6 +29,15 @@
   .heading-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600;
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 body {

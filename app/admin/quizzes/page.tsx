@@ -19,22 +19,89 @@ export default async function QuizzesPage() {
     }
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 sm:space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold font-heading text-slate-900">Quizzes</h2>
-                    <p className="text-slate-500 mt-1">Manage your quizzes and view their performance.</p>
+                    <h2 className="text-2xl sm:text-3xl font-bold font-heading text-slate-900">Quizzes</h2>
+                    <p className="text-sm sm:text-base text-slate-500 mt-1">Manage your quizzes and view their performance.</p>
                 </div>
                 <Link
                     href="/admin/quizzes/new"
-                    className="flex items-center px-5 py-2.5 text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all hover:scale-105"
+                    className="flex items-center justify-center px-5 py-2.5 text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all hover:scale-105 min-h-[44px] text-sm sm:text-base"
                 >
                     <Plus className="w-5 h-5 mr-2" />
                     Create New Quiz
                 </Link>
             </div>
 
-            <div className="glass-panel rounded-2xl overflow-hidden">
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+                {quizzes.map((quiz) => (
+                    <div key={quiz.id} className="glass-panel rounded-2xl p-4">
+                        <div className="flex items-start space-x-3 mb-3">
+                            <div className="p-2 bg-blue-50 rounded-lg text-blue-600 flex-shrink-0">
+                                <FileText className="w-5 h-5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className="font-medium text-slate-900 truncate">{quiz.title}</h3>
+                                <p className="text-xs text-slate-500 line-clamp-2">{quiz.description}</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 mb-3 text-xs text-slate-500">
+                            <span
+                                className={`px-2 py-1 text-xs font-medium rounded-full border ${quiz.isActive
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                    : 'bg-slate-100 text-slate-600 border-slate-200'
+                                    }`}
+                            >
+                                {quiz.isActive ? 'Active' : 'Draft'}
+                            </span>
+                            <span>Created {new Date(quiz.createdAt).toLocaleDateString()}</span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <Link
+                                href={`/admin/quizzes/${quiz.id}`}
+                                className="flex items-center justify-center px-3 py-2 text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors min-h-[44px]"
+                            >
+                                <Edit className="w-4 h-4 mr-1.5" />
+                                Edit
+                            </Link>
+                            <Link
+                                href={`/admin/quizzes/${quiz.id}/analytics`}
+                                className="flex items-center justify-center px-3 py-2 text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors min-h-[44px]"
+                            >
+                                <BarChart3 className="w-4 h-4 mr-1.5" />
+                                Analytics
+                            </Link>
+                            <Link
+                                href={`/admin/quizzes/${quiz.id}/integrations`}
+                                className="flex items-center justify-center px-3 py-2 text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors min-h-[44px]"
+                            >
+                                <Plug className="w-4 h-4 mr-1.5" />
+                                Integrations
+                            </Link>
+                            <Link
+                                href={`/quiz/${quiz.slug}`}
+                                target="_blank"
+                                className="flex items-center justify-center px-3 py-2 text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors min-h-[44px]"
+                            >
+                                <ExternalLink className="w-4 h-4 mr-1.5" />
+                                View
+                            </Link>
+                        </div>
+                    </div>
+                ))}
+                {quizzes.length === 0 && (
+                    <div className="glass-panel rounded-2xl p-8 text-center text-slate-500">
+                        No quizzes found. Create one to get started!
+                    </div>
+                )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block glass-panel rounded-2xl overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>

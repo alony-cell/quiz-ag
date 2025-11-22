@@ -30,7 +30,7 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
 
     const questions = quiz.questions || [];
     const currentQuestion = questions[currentStep];
-    const progress = ((currentStep + 1) / questions.length) * 100;
+    const progress = questions.length > 0 ? ((currentStep + 1) / questions.length) * 100 : 0;
 
     useEffect(() => {
         if (!hasTrackedStart.current) {
@@ -113,9 +113,9 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
             timeTaken,
             lead: {
                 email: data.email,
-                name: data.firstName, // Map from custom fields if needed
+                name: data.firstName,
                 phone: data.phone,
-                metadata: data, // Store all form data
+                metadata: data,
                 hiddenData,
                 score,
                 outcome,
@@ -132,6 +132,47 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
         setQuizState('results');
     };
 
+    const design = quiz.design || {
+        colors: {
+            primary: '#2563eb',
+            background: '#f8fafc',
+            text: '#0f172a',
+            accent: '#3b82f6',
+        },
+        typography: {
+            fontFamily: 'inter',
+            headingFont: 'outfit',
+        },
+        layout: {
+            cardStyle: 'glass' as const,
+            borderRadius: 'xl' as const,
+            shadow: 'lg' as const,
+        },
+    };
+
+    const fontStyle = {
+        fontFamily: design.typography.fontFamily === 'inter' ? 'var(--font-inter)' :
+            design.typography.fontFamily === 'outfit' ? 'var(--font-outfit)' :
+                design.typography.fontFamily === 'poppins' ? 'Poppins, sans-serif' :
+                    design.typography.fontFamily === 'playfair' ? 'Playfair Display, serif' :
+                        design.typography.fontFamily === 'lora' ? 'Lora, serif' :
+                            design.typography.fontFamily === 'roboto' ? 'Roboto, sans-serif' :
+                                design.typography.fontFamily,
+    };
+
+    // Show lead form if quiz state is lead_capture
+    if (quizState === 'lead_capture') {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8" style={{ backgroundColor: design.colors.background, backgroundImage: design.colors.gradient }}>
+                <LeadForm
+                    fields={quiz.settings?.leadCapture.fields}
+                    onSubmit={handleLeadSubmit}
+                />
+            </div>
+        );
+    }
+
+    // Show results if quiz state is results
     if (quizState === 'results') {
         return (
             <motion.div
@@ -144,116 +185,76 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
         );
     }
 
-    if (quizState === 'lead_capture') {
+    // Error state: No questions
+    if (questions.length === 0 || !currentQuestion) {
         return (
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                <LeadForm
-                    fields={quiz.settings?.leadCapture.fields}
-                    onSubmit={handleLeadSubmit}
-                />
-            </motion.div>
+            <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8" style={{ backgroundColor: design.colors.background }}>
+                <div className="max-w-md mx-auto text-center bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                    <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Quiz Not Ready</h2>
+                    <p className="text-slate-600 mb-4">
+                        This quiz doesn't have any questions yet. Please contact the quiz creator to add questions.
+                    </p>
+                    <p className="text-sm text-slate-500">
+                        Quiz ID: {quiz.id}
+                    </p>
+                </div>
+            </div>
         );
     }
 
-    const design = quiz.design || {
-        colors: { primary: '#2563eb', background: '#f8fafc', text: '#0f172a', accent: '#3b82f6' },
-        typography: { fontFamily: 'inter', headingFont: 'outfit' },
-        layout: { cardStyle: 'glass', borderRadius: 'xl', shadow: 'lg' },
-    };
-
-    const getCardStyle = () => {
-        const base = "transition-all duration-300";
-        const radius = design.layout.borderRadius === 'full' ? 'rounded-[2rem]' :
-            design.layout.borderRadius === 'xl' ? 'rounded-2xl' :
-                design.layout.borderRadius === 'lg' ? 'rounded-xl' :
-                    design.layout.borderRadius === 'md' ? 'rounded-lg' :
-                        design.layout.borderRadius === 'sm' ? 'rounded' : 'rounded-none';
-
-        const shadow = design.layout.shadow === 'lg' ? 'shadow-xl' :
-            design.layout.shadow === 'md' ? 'shadow-lg' :
-                design.layout.shadow === 'sm' ? 'shadow-sm' : 'shadow-none';
-
-        const padding = design.layout.spacing === 'compact' ? 'p-6' :
-            design.layout.spacing === 'spacious' ? 'p-12' : 'p-8';
-
-        if (design.layout.cardStyle === 'glass') {
-            return `${base} ${radius} ${shadow} ${padding} backdrop-blur-lg border border-white/20`;
-        }
-        if (design.layout.cardStyle === 'solid') {
-            return `${base} ${radius} ${shadow} ${padding} bg-white border border-slate-100`;
-        }
-        return `${base} ${radius} ${padding} bg-transparent border-2 border-slate-200`;
-    };
-
-    const cardInlineStyle = design.layout.cardStyle === 'glass' ? {
-        backgroundColor: `rgba(255, 255, 255, ${design.layout.opacity ?? 0.8})`
-    } : {};
-
-    const fontStyle = {
-        fontFamily: design.typography.fontFamily === 'inter' ? 'var(--font-inter)' :
-            design.typography.fontFamily === 'outfit' ? 'var(--font-outfit)' :
-                design.typography.fontFamily === 'poppins' ? 'Poppins, sans-serif' :
-                    design.typography.fontFamily,
-        color: design.colors.text,
-    };
-
-    const headingStyle = {
-        fontFamily: design.typography.headingFont === 'outfit' ? 'var(--font-outfit)' :
-            design.typography.headingFont === 'inter' ? 'var(--font-inter)' :
-                design.typography.headingFont === 'poppins' ? 'Poppins, sans-serif' :
-                    design.typography.headingFont,
-        color: design.colors.text,
-    };
-
+    // Main quiz view
     return (
-        <div className="max-w-2xl mx-auto" style={fontStyle}>
-            {/* Progress Bar */}
-            <div className="mb-8">
-                <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                    <motion.div
-                        className="h-full"
-                        style={{ backgroundColor: design.colors.primary }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.5 }}
-                    />
+        <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8" style={{ backgroundColor: design.colors.background, backgroundImage: design.colors.gradient }} {...fontStyle}>
+            <div className="max-w-2xl mx-auto px-2 sm:px-0" style={fontStyle}>
+                {/* Progress Bar */}
+                <div className="mb-6 sm:mb-8">
+                    <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                        <motion.div
+                            className="h-full"
+                            style={{ backgroundColor: design.colors.primary }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ duration: 0.5 }}
+                        />
+                    </div>
+                    <p className="text-xs sm:text-sm mt-2 text-right font-medium" style={{ color: design.colors.text, opacity: 0.7 }}>
+                        Question {currentStep + 1} of {questions.length}
+                    </p>
                 </div>
-                <p className="text-sm mt-2 text-right font-medium" style={{ color: design.colors.text, opacity: 0.7 }}>
-                    Question {currentStep + 1} of {questions.length}
-                </p>
-            </div>
 
-            {/* Question Card */}
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={currentQuestion.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-full"
-                >
-                    <QuestionCard
-                        question={currentQuestion}
-                        design={design}
-                        onAnswer={handleAnswer}
-                        selectedOptions={selectedOptions[currentQuestion.id] || []}
-                        textAnswer={textAnswer}
-                        onTextAnswerChange={setTextAnswer}
-                        onSelectionChange={(newSelection) => {
-                            setSelectedOptions({
-                                ...selectedOptions,
-                                [currentQuestion.id]: newSelection
-                            });
-                        }}
-                        onBack={currentStep > 0 ? () => setCurrentStep(currentStep - 1) : undefined}
-                    />
-                </motion.div>
-            </AnimatePresence>
+                {/* Question Card */}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentQuestion.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="w-full"
+                    >
+                        <QuestionCard
+                            question={currentQuestion}
+                            design={design}
+                            onAnswer={handleAnswer}
+                            selectedOptions={selectedOptions[currentQuestion.id] || []}
+                            textAnswer={textAnswer}
+                            onTextAnswerChange={setTextAnswer}
+                            onSelectionChange={(newSelection) => {
+                                setSelectedOptions({
+                                    ...selectedOptions,
+                                    [currentQuestion.id]: newSelection
+                                });
+                            }}
+                            onBack={currentStep > 0 ? () => setCurrentStep(currentStep - 1) : undefined}
+                        />
+                    </motion.div>
+                </AnimatePresence>
+            </div>
         </div>
     );
 }

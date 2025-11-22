@@ -50,10 +50,35 @@ export interface DesignConfig {
         gradient?: string;
         gradientStart?: string;
         gradientEnd?: string;
+        // Phase 1: Enhanced colors
+        secondary?: string;
+        success?: string;
+        warning?: string;
+        error?: string;
+        gradientAngle?: number; // 0-360 degrees
+        gradientType?: 'linear' | 'radial' | 'conic';
+        overlay?: string; // Color overlay on background image
+        overlayOpacity?: number; // 0-1
     };
     typography: {
         fontFamily: 'inter' | 'outfit' | 'serif' | 'mono' | 'playfair' | 'lora' | 'roboto' | 'poppins';
         headingFont: 'inter' | 'outfit' | 'serif' | 'mono' | 'playfair' | 'lora' | 'roboto' | 'poppins';
+        // Phase 1: Advanced typography
+        fontSize?: {
+            base?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+            scale?: number; // 0.8 - 1.5
+        };
+        fontWeight?: {
+            normal?: 300 | 400 | 500;
+            medium?: 500 | 600;
+            bold?: 600 | 700 | 800;
+        };
+        lineHeight?: 'tight' | 'normal' | 'relaxed' | 'loose';
+        letterSpacing?: 'tighter' | 'tight' | 'normal' | 'wide' | 'wider';
+        customFonts?: {
+            url: string;
+            family: string;
+        }[];
     };
     layout: {
         cardStyle: 'glass' | 'solid' | 'minimal';
@@ -61,6 +86,14 @@ export interface DesignConfig {
         shadow: 'none' | 'sm' | 'md' | 'lg';
         opacity?: number;
         spacing?: 'compact' | 'comfortable' | 'spacious';
+        // Phase 2: Advanced layout
+        maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+        cardBorder?: {
+            width?: 'none' | 'thin' | 'medium' | 'thick';
+            color?: string;
+            style?: 'solid' | 'dashed' | 'dotted';
+        };
+        backgroundBlur?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
     };
     elements?: {
         title?: {
@@ -86,8 +119,57 @@ export interface DesignConfig {
             textColor?: string;
             borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
         };
+        // Phase 1: Progress bar
+        progressBar?: {
+            show?: boolean;
+            position?: 'top' | 'bottom';
+            style?: 'bar' | 'dots' | 'steps' | 'percentage';
+            color?: string;
+            backgroundColor?: string;
+            height?: 'thin' | 'medium' | 'thick';
+            showPercentage?: boolean;
+        };
+        // Phase 2: Images
+        images?: {
+            borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+            aspectRatio?: '16:9' | '4:3' | '1:1' | 'auto';
+            objectFit?: 'cover' | 'contain' | 'fill';
+            filter?: 'none' | 'grayscale' | 'sepia' | 'blur';
+            overlay?: string;
+            overlayOpacity?: number;
+        };
     };
     backgroundImage?: string;
+    // Phase 1: Animations
+    animations?: {
+        enabled?: boolean;
+        questionTransition?: 'fade' | 'slide' | 'scale' | 'none';
+        transitionDuration?: 'fast' | 'normal' | 'slow';
+        buttonHoverEffect?: 'lift' | 'glow' | 'scale' | 'none';
+        progressBarAnimation?: boolean;
+    };
+    // Phase 2: Branding
+    branding?: {
+        logo?: {
+            url: string;
+            position?: 'top-left' | 'top-center' | 'top-right';
+            size?: 'sm' | 'md' | 'lg';
+            link?: string;
+        };
+        favicon?: string;
+        poweredByText?: string;
+        showPoweredBy?: boolean;
+    };
+    // Phase 3: Advanced features
+    advanced?: {
+        customCSS?: string;
+        customHeadHTML?: string;
+    };
+    responsive?: {
+        mobileFontScale?: number;
+        mobileSpacing?: 'tighter' | 'normal' | 'looser';
+        hideElementsOnMobile?: ('logo' | 'description' | 'progressBar')[];
+    };
 }
 
 export interface ThankYouPage {

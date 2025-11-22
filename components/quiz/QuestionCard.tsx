@@ -34,8 +34,8 @@ export default function QuestionCard({
             design.layout.shadow === 'md' ? 'shadow-lg' :
                 design.layout.shadow === 'sm' ? 'shadow-sm' : 'shadow-none';
 
-        const padding = design.layout.spacing === 'compact' ? 'p-6' :
-            design.layout.spacing === 'spacious' ? 'p-12' : 'p-8';
+        const padding = design.layout.spacing === 'compact' ? 'p-4 sm:p-6' :
+            design.layout.spacing === 'spacious' ? 'p-6 sm:p-12' : 'p-4 sm:p-8';
 
         if (design.layout.cardStyle === 'glass') {
             return `${base} ${radius} ${shadow} ${padding} backdrop-blur-lg border border-white/20`;
@@ -151,18 +151,18 @@ export default function QuestionCard({
 
             case 'image':
                 return question.imageUrl ? (
-                    <div key="image" className="mb-6 rounded-xl overflow-hidden shadow-md">
+                    <div key="image" className="mb-4 sm:mb-6 rounded-xl overflow-hidden shadow-md">
                         <img
                             src={question.imageUrl}
                             alt={question.text}
-                            className="w-full h-auto object-cover max-h-64"
+                            className="w-full h-auto object-cover max-h-48 sm:max-h-64"
                         />
                     </div>
                 ) : null;
 
             case 'title':
                 return (
-                    <h2 key="title" className="text-2xl font-bold mb-4" style={headingStyle}>
+                    <h2 key="title" className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4" style={headingStyle}>
                         {question.text}
                         {question.isRequired !== false && <span className="text-red-500 ml-1">*</span>}
                     </h2>
@@ -170,7 +170,7 @@ export default function QuestionCard({
 
             case 'description':
                 return question.description ? (
-                    <p key="description" className="text-lg mb-6 opacity-80" style={descriptionStyle}>
+                    <p key="description" className="text-base sm:text-lg mb-4 sm:mb-6 opacity-80" style={descriptionStyle}>
                         {question.description}
                     </p>
                 ) : null;
@@ -178,7 +178,7 @@ export default function QuestionCard({
             case 'answers':
                 if (question.type === 'content') return null; // Content type doesn't have answers block, just button
                 return (
-                    <div key="answers" className="space-y-3 mb-6">
+                    <div key="answers" className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                         {question.type === 'text' ? (
                             <form
                                 onSubmit={(e) => {
@@ -190,7 +190,7 @@ export default function QuestionCard({
                                     type="text"
                                     value={textAnswer}
                                     onChange={(e) => onTextAnswerChange?.(e.target.value)}
-                                    className="w-full p-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all text-lg"
+                                    className="w-full p-3 sm:p-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all text-base sm:text-lg min-h-[44px]"
                                     placeholder="Type your answer here..."
                                     autoFocus
                                     style={{
@@ -225,7 +225,7 @@ export default function QuestionCard({
                                                 : [...current, option.value];
                                             onSelectionChange?.(newSelection);
                                         }}
-                                        className={`w-full p-4 text-left border-2 transition-all flex items-center justify-between group bg-white ${isSelected
+                                        className={`w-full p-3 sm:p-4 text-left border-2 transition-all flex items-center justify-between group bg-white min-h-[44px] ${isSelected
                                             ? 'border-blue-500'
                                             : 'border-slate-200 hover:border-blue-300'
                                             }`}
@@ -245,7 +245,7 @@ export default function QuestionCard({
                                                     ) : null}
                                                 </div>
                                             )}
-                                            <span className="font-medium text-lg" style={fontStyle}>{option.label}</span>
+                                            <span className="font-medium text-base sm:text-lg" style={fontStyle}>{option.label}</span>
                                         </div>
                                         {isSelected && (
                                             <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: design.colors.primary }}>
@@ -278,7 +278,7 @@ export default function QuestionCard({
                                     <button
                                         key={option.value}
                                         onClick={() => handleSingleChoiceSelection(option.value)}
-                                        className={`w-full p-4 text-left border-2 transition-all group bg-white ${isSelected
+                                        className={`w-full p-3 sm:p-4 text-left border-2 transition-all group bg-white min-h-[44px] ${isSelected
                                             ? 'border-blue-500'
                                             : 'border-slate-200 hover:border-blue-300'
                                             }`}
@@ -298,7 +298,7 @@ export default function QuestionCard({
                                                     ) : null}
                                                 </div>
                                             )}
-                                            <span className="font-medium text-lg" style={fontStyle}>{option.label}</span>
+                                            <span className="font-medium text-base sm:text-lg" style={fontStyle}>{option.label}</span>
                                         </div>
                                     </button>
                                 );
@@ -314,7 +314,7 @@ export default function QuestionCard({
                         <button
                             key="button"
                             onClick={() => onAnswer(question.id, 'continue')}
-                            className="w-full py-4 px-6 font-semibold text-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg"
+                            className="w-full py-3 sm:py-4 px-6 font-semibold text-base sm:text-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg min-h-[44px]"
                             style={getButtonStyle()}
                         >
                             {question.buttonText || 'Continue'}
@@ -329,12 +329,12 @@ export default function QuestionCard({
                 if (!showSkip && !showSubmit) return null;
 
                 return (
-                    <div key="button" className="flex gap-3 mt-4">
+                    <div key="button" className="flex gap-2 sm:gap-3 mt-4">
                         {showSkip && (
                             <button
                                 type="button"
                                 onClick={() => onAnswer(question.id, question.type === 'multi_select' ? [] : '')}
-                                className="flex-1 py-3 px-6 rounded-xl font-semibold transition-all border-2 border-slate-200 hover:bg-slate-50 text-slate-600"
+                                className="flex-1 py-3 px-4 sm:px-6 rounded-xl font-semibold transition-all border-2 border-slate-200 hover:bg-slate-50 text-slate-600 min-h-[44px] text-sm sm:text-base"
                             >
                                 Skip
                             </button>
@@ -351,7 +351,7 @@ export default function QuestionCard({
                                     }
                                 }}
                                 disabled={isNextDisabled() && question.isRequired !== false}
-                                className="flex-1 py-3 px-6 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 py-3 px-4 sm:px-6 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] text-sm sm:text-base"
                                 style={getButtonStyle()}
                             >
                                 {question.buttonText || (question.type === 'text' ? 'Next' : 'Continue')}
