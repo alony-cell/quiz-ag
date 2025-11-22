@@ -206,8 +206,9 @@ export default function DesignEditor({ quiz, onUpdate }: DesignEditorProps) {
                                                 />
                                                 <button
                                                     onClick={() => {
-                                                        const { [key]: _, ...rest } = design.colors;
-                                                        setDesign({ ...design, colors: rest });
+                                                        const newColors = { ...design.colors };
+                                                        delete (newColors as any)[key];
+                                                        setDesign({ ...design, colors: newColors });
                                                     }}
                                                     className="text-xs text-slate-500 hover:text-red-500"
                                                 >
