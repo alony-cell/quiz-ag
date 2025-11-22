@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Save, ArrowLeft } from 'lucide-react';
+import { Save, ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Quiz } from '@/types';
+import { saveQuiz } from '@/app/actions/quiz';
 
 interface QuizEditorProps {
     initialData?: Partial<Quiz>;
@@ -13,6 +14,7 @@ interface QuizEditorProps {
 
 export default function QuizEditor({ initialData, isNew = false }: QuizEditorProps) {
     const router = useRouter();
+    const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState<Partial<Quiz>>({
         title: '',
         slug: '',
@@ -23,9 +25,23 @@ export default function QuizEditor({ initialData, isNew = false }: QuizEditorPro
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // In a real app, we would make an API call here
-        console.log('Saving quiz:', formData);
-        router.push('/admin/dashboard');
+        setIsSaving(true);
+
+        try {
+            const result = await saveQuiz({
+                ...formData,
+                questions: formData.questions || [],
+            });
+
+            if (result.success && result.quizId) {
+                router.push(`/admin/quizzes/${result.quizId}`);
+            }
+        } catch (error) {
+            console.error('Failed to save quiz:', error);
+            alert('Failed to save quiz. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -44,10 +60,11 @@ export default function QuizEditor({ initialData, isNew = false }: QuizEditorPro
                 </div>
                 <button
                     onClick={handleSubmit}
-                    className="flex items-center px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                    disabled={isSaving}
+                    className="flex items-center px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    <Save className="w-5 h-5 mr-2" />
-                    Save Quiz
+                    {isSaving ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Save className="w-5 h-5 mr-2" />}
+                    {isSaving ? 'Saving...' : 'Save Quiz'}
                 </button>
             </div>
 
