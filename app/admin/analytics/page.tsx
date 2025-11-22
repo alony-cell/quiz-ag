@@ -1,6 +1,8 @@
 import { BarChart3, TrendingUp, Users, MousePointerClick } from 'lucide-react';
 import { getGlobalStats } from '@/app/actions/analytics';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AnalyticsPage() {
     const stats = await getGlobalStats();
 

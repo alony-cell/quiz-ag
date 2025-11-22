@@ -3,6 +3,8 @@ import { getQuizzes, deleteQuiz } from '@/app/actions/quiz';
 import { Plus, FileText, MoreVertical, ExternalLink, Trash2, Edit } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
 
+export const dynamic = 'force-dynamic';
+
 export default async function QuizzesPage() {
     const quizzes = await getQuizzes();
 

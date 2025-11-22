@@ -2,6 +2,8 @@ import QuizEngine from '@/components/quiz/QuizEngine';
 import { getQuizBySlug } from '@/app/actions/quiz';
 import { notFound } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 export default async function QuizPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
     const quiz = await getQuizBySlug(slug);

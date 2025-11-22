@@ -3,6 +3,8 @@ import { Plus, Users, FileText, TrendingUp, ArrowUpRight } from 'lucide-react';
 import { getQuizzes } from '@/app/actions/quiz';
 import { getGlobalStats } from '@/app/actions/analytics';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
     const quizzes = await getQuizzes();
     const stats = await getGlobalStats();

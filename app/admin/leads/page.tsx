@@ -1,6 +1,8 @@
 import { getAllLeads } from '@/app/actions/analytics';
 import { Users, Mail, Calendar, FileText } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function LeadsPage() {
     const leads = await getAllLeads();
 
