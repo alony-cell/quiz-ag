@@ -7,8 +7,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LeadForm from './LeadForm';
 import ResultsView from './ResultsView';
 import QuestionCard from './QuestionCard';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 import { submitResponse } from '@/app/actions/response';
+import { trackEvent } from '@/app/actions/analytics';
 
 interface QuizEngineProps {
     quiz: Quiz;
@@ -21,13 +24,41 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
     const [textAnswer, setTextAnswer] = useState('');
     const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({});
     const [startTime] = useState(Date.now());
+    const [sessionId] = useState(() => crypto.randomUUID());
+    const searchParams = useSearchParams();
+    const hasTrackedStart = useRef(false);
 
     const questions = quiz.questions || [];
     const currentQuestion = questions[currentStep];
     const progress = ((currentStep + 1) / questions.length) * 100;
 
+    useEffect(() => {
+        if (!hasTrackedStart.current) {
+            trackEvent({ quizId: quiz.id, sessionId, type: 'start' });
+            hasTrackedStart.current = true;
+        }
+    }, [quiz.id, sessionId]);
+
+    useEffect(() => {
+        if (currentQuestion) {
+            trackEvent({
+                quizId: quiz.id,
+                sessionId,
+                type: 'view',
+                metadata: { questionId: currentQuestion.id }
+            });
+        }
+    }, [currentQuestion, quiz.id, sessionId]);
+
     const handleAnswer = (questionId: string, value: string | string[]) => {
         setAnswers({ ...answers, [questionId]: value });
+        trackEvent({
+            quizId: quiz.id,
+            sessionId,
+            type: 'answer',
+            metadata: { questionId, value }
+        });
+
         // Reset local state
         setTextAnswer('');
 
@@ -38,8 +69,43 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
         }
     };
 
-    const handleLeadSubmit = async (data: { email: string; firstName?: string }) => {
+    const handleLeadSubmit = async (data: Record<string, any>) => {
         const timeTaken = Math.round((Date.now() - startTime) / 1000);
+
+        // Calculate Score
+        let score = 0;
+        questions.forEach(q => {
+            const answer = answers[q.id];
+            if (Array.isArray(answer)) {
+                // Multi-select: sum of selected options
+                answer.forEach(val => {
+                    const option = q.options?.find(o => o.value === val);
+                    if (option?.score) score += option.score;
+                });
+            } else {
+                // Single select
+                const option = q.options?.find(o => o.value === answer);
+                if (option?.score) score += option.score;
+            }
+        });
+
+        // Determine Outcome
+        let outcome = 'Default Outcome';
+        if (quiz.thankYouPages && quiz.thankYouPages.length > 0) {
+            const matchedPage = quiz.thankYouPages.find(p =>
+                score >= (p.scoreRangeMin || 0) && score <= (p.scoreRangeMax || 100)
+            );
+            if (matchedPage) outcome = matchedPage.title;
+        }
+
+        // Collect Hidden Data
+        const hiddenData: Record<string, any> = {};
+        searchParams.forEach((value, key) => {
+            if (key.startsWith('utm_') || key === 'ref') {
+                hiddenData[key] = value;
+            }
+        });
+        hiddenData.userAgent = navigator.userAgent;
 
         await submitResponse({
             quizId: quiz.id,
@@ -47,8 +113,20 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
             timeTaken,
             lead: {
                 email: data.email,
-                name: data.firstName,
+                name: data.firstName, // Map from custom fields if needed
+                phone: data.phone,
+                metadata: data, // Store all form data
+                hiddenData,
+                score,
+                outcome,
             }
+        });
+
+        trackEvent({
+            quizId: quiz.id,
+            sessionId,
+            type: 'complete',
+            metadata: { score, outcome }
         });
 
         setQuizState('results');
@@ -73,7 +151,10 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
             >
-                <LeadForm onSubmit={handleLeadSubmit} />
+                <LeadForm
+                    fields={quiz.settings?.leadCapture.fields}
+                    onSubmit={handleLeadSubmit}
+                />
             </motion.div>
         );
     }

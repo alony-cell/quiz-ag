@@ -1,4 +1,4 @@
-export type QuestionType = 'multiple_choice' | 'text' | 'true_false' | 'rating' | 'multi_select' | 'content';
+export type QuestionType = 'multiple_choice' | 'text' | 'true_false' | 'rating' | 'multi_select' | 'content' | 'single_choice' | 'yes_no' | 'scale' | 'testimonial' | 'product';
 
 export interface AnswerOption {
     value: string;
@@ -7,6 +7,7 @@ export interface AnswerOption {
     imageUrl?: string;    // Image URL
     imageSize?: 'sm' | 'md' | 'lg';
     imagePosition?: 'left' | 'right' | 'top' | 'bottom';
+    score?: number;       // Score for this option
 }
 
 export interface Question {
@@ -23,6 +24,12 @@ export interface Question {
     isRequired?: boolean;
     allowBack?: boolean;
     structure?: QuestionElement[];
+    logic?: {
+        trigger: string; // 'value_equals', etc.
+        value: string;
+        action: 'jump_to';
+        target: string; // questionId
+    }[];
 }
 
 export type QuestionElementId = 'image' | 'title' | 'description' | 'answers' | 'button' | 'backButton';
@@ -83,6 +90,34 @@ export interface DesignConfig {
     backgroundImage?: string;
 }
 
+export interface ThankYouPage {
+    id: string;
+    quizId: string;
+    title: string;
+    content?: string;
+    buttonText?: string;
+    buttonUrl?: string;
+    scoreRangeMin?: number;
+    scoreRangeMax?: number;
+    imageUrl?: string;
+}
+
+export interface QuizSettings {
+    general: {
+        showProgressBar: boolean;
+        autoAdvance: boolean;
+    };
+    leadCapture: {
+        enabled: boolean;
+        fields: {
+            id: string;
+            type: 'email' | 'text' | 'phone' | 'checkbox';
+            label: string;
+            required: boolean;
+        }[];
+    };
+}
+
 export interface Quiz {
     id: string;
     title: string;
@@ -91,7 +126,9 @@ export interface Quiz {
     isActive: boolean;
     createdAt: string;
     questions?: Question[];
+    thankYouPages?: ThankYouPage[];
     design?: DesignConfig;
+    settings?: QuizSettings;
 }
 
 export interface Lead {
@@ -102,6 +139,9 @@ export interface Lead {
     lastName?: string;
     createdAt: string;
     metadata?: Record<string, any>;
+    hiddenData?: Record<string, any>;
+    score?: number;
+    outcome?: string;
 }
 
 export interface QuizResult {

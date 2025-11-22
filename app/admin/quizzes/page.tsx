@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getQuizzes, deleteQuiz } from '@/app/actions/quiz';
-import { Plus, FileText, MoreVertical, ExternalLink, Edit } from 'lucide-react';
+import { Plus, FileText, MoreVertical, ExternalLink, Edit, BarChart3, Plug } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
 import DeleteQuizButton from '@/components/admin/DeleteQuizButton';
 
@@ -85,6 +85,20 @@ export default async function QuizzesPage() {
                                                 title="View Public Page"
                                             >
                                                 <ExternalLink className="w-4 h-4" />
+                                            </Link>
+                                            <Link
+                                                href={`/admin/quizzes/${quiz.id}/integrations`}
+                                                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                title="Integrations"
+                                            >
+                                                <Plug className="w-4 h-4" />
+                                            </Link>
+                                            <Link
+                                                href={`/admin/quizzes/${quiz.id}/analytics`}
+                                                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                title="View Analytics"
+                                            >
+                                                <BarChart3 className="w-4 h-4" />
                                             </Link>
                                             <Link
                                                 href={`/admin/quizzes/${quiz.id}`}

@@ -116,11 +116,16 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                             {[
                                 { id: 'multiple_choice', label: 'Multiple Choice' },
+                                { id: 'single_choice', label: 'Single Choice' },
                                 { id: 'multi_select', label: 'Multi-Select' },
                                 { id: 'true_false', label: 'True / False' },
+                                { id: 'yes_no', label: 'Yes / No' },
                                 { id: 'rating', label: 'Rating (1-5)' },
+                                { id: 'scale', label: 'Scale (1-10)' },
                                 { id: 'text', label: 'Text Input' },
                                 { id: 'content', label: 'Content Card' },
+                                { id: 'testimonial', label: 'Testimonial' },
+                                { id: 'product', label: 'Product' },
                             ].map((type) => (
                                 <button
                                     key={type.id}
@@ -129,10 +134,15 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                                         let newOptions = question.options;
                                         if (type.id === 'true_false') {
                                             newOptions = [
-                                                { value: 'true', label: 'True' },
-                                                { value: 'false', label: 'False' },
+                                                { value: 'true', label: 'True', score: 1 },
+                                                { value: 'false', label: 'False', score: 0 },
                                             ];
-                                        } else if (type.id === 'rating' || type.id === 'content') {
+                                        } else if (type.id === 'yes_no') {
+                                            newOptions = [
+                                                { value: 'yes', label: 'Yes', score: 1 },
+                                                { value: 'no', label: 'No', score: 0 },
+                                            ];
+                                        } else if (['rating', 'content', 'testimonial', 'product', 'scale'].includes(type.id)) {
                                             newOptions = [];
                                         }
                                         setQuestion({ ...question, type: type.id as any, options: newOptions });
@@ -216,7 +226,7 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                         </div>
                     </div>
 
-                    {(question.type === 'multiple_choice' || question.type === 'multi_select') && (
+                    {(question.type === 'multiple_choice' || question.type === 'single_choice' || question.type === 'multi_select') && (
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-3">
                                 Answer Options
@@ -238,8 +248,8 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                                             </button>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <div className="col-span-1">
                                                 <label className="block text-xs font-medium text-slate-600 mb-1">
                                                     Label (Display Text)
                                                 </label>
@@ -255,7 +265,7 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                                                     placeholder="e.g., Strongly Agree"
                                                 />
                                             </div>
-                                            <div>
+                                            <div className="col-span-1">
                                                 <label className="block text-xs font-medium text-slate-600 mb-1">
                                                     Value (Data)
                                                 </label>
@@ -269,6 +279,22 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                                                     }}
                                                     className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 border"
                                                     placeholder="e.g., strongly_agree"
+                                                />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <label className="block text-xs font-medium text-slate-600 mb-1">
+                                                    Score
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    value={option.score || 0}
+                                                    onChange={(e) => {
+                                                        const newOptions = [...(question.options || [])];
+                                                        newOptions[index] = { ...option, score: parseInt(e.target.value) || 0 };
+                                                        setQuestion({ ...question, options: newOptions });
+                                                    }}
+                                                    className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 border"
+                                                    placeholder="0"
                                                 />
                                             </div>
                                         </div>

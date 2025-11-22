@@ -4,10 +4,11 @@ import { useState } from 'react';
 import QuizEditor from '@/components/admin/QuizEditor';
 import QuestionList from '@/components/admin/QuestionList';
 import DesignEditor from '@/components/admin/DesignEditor';
-import { Quiz, Question, DesignConfig } from '@/types';
+import { Quiz, Question, DesignConfig, ThankYouPage } from '@/types';
 import { saveQuiz } from '@/app/actions/quiz';
 import { Save, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import ThankYouEditor from './ThankYouEditor';
 
 interface QuizManagerProps {
     initialQuiz: Quiz;
@@ -15,7 +16,7 @@ interface QuizManagerProps {
 
 export default function QuizManager({ initialQuiz }: QuizManagerProps) {
     const [quiz, setQuiz] = useState<Quiz>(initialQuiz);
-    const [activeTab, setActiveTab] = useState<'settings' | 'questions' | 'design'>('questions');
+    const [activeTab, setActiveTab] = useState<'settings' | 'questions' | 'design' | 'outcomes'>('questions');
     const [isSaving, setIsSaving] = useState(false);
     const router = useRouter();
 
@@ -25,6 +26,10 @@ export default function QuizManager({ initialQuiz }: QuizManagerProps) {
 
     const handleUpdateDesign = (design: DesignConfig) => {
         setQuiz({ ...quiz, design });
+    };
+
+    const handleUpdateThankYouPages = (thankYouPages: ThankYouPage[]) => {
+        setQuiz({ ...quiz, thankYouPages });
     };
 
     const handleSave = async () => {
@@ -84,6 +89,15 @@ export default function QuizManager({ initialQuiz }: QuizManagerProps) {
                         Design
                     </button>
                     <button
+                        onClick={() => setActiveTab('outcomes')}
+                        className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === 'outcomes'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                            }`}
+                    >
+                        Outcomes ({quiz.thankYouPages?.length || 0})
+                    </button>
+                    <button
                         onClick={() => setActiveTab('settings')}
                         className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === 'settings'
                             ? 'border-blue-500 text-blue-600'
@@ -105,6 +119,11 @@ export default function QuizManager({ initialQuiz }: QuizManagerProps) {
                     />
                 ) : activeTab === 'design' ? (
                     <DesignEditor quiz={quiz} onUpdate={handleUpdateDesign} />
+                ) : activeTab === 'outcomes' ? (
+                    <ThankYouEditor
+                        thankYouPages={quiz.thankYouPages || []}
+                        onUpdate={handleUpdateThankYouPages}
+                    />
                 ) : (
                     <QuizEditor initialData={quiz} />
                 )}

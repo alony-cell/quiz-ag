@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db';
-import { quizzes, questions } from '@/db/schema';
+import { quizzes, questions, thankYouPages } from '@/db/schema';
 import { eq, desc, asc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { Quiz, Question } from '@/types';
@@ -33,6 +33,7 @@ export async function getQuiz(id: string) {
                 questions: {
                     orderBy: [asc(questions.order)],
                 },
+                thankYouPages: true,
             },
         });
 
@@ -55,6 +56,7 @@ export async function getQuizBySlug(slug: string) {
                 questions: {
                     orderBy: [asc(questions.order)],
                 },
+                thankYouPages: true,
             },
         });
 
@@ -124,6 +126,27 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
             );
         }
 
+        // 4. Handle Thank You Pages
+        if (quizData.id) {
+            await db.delete(thankYouPages).where(eq(thankYouPages.quizId, quizData.id));
+        }
+
+        if (quizData.thankYouPages && quizData.thankYouPages.length > 0) {
+            await db.insert(thankYouPages).values(
+                quizData.thankYouPages.map((p) => ({
+                    id: p.id,
+                    quizId: savedQuiz.id,
+                    title: p.title,
+                    content: p.content,
+                    buttonText: p.buttonText,
+                    buttonUrl: p.buttonUrl,
+                    scoreRangeMin: p.scoreRangeMin,
+                    scoreRangeMax: p.scoreRangeMax,
+                    imageUrl: p.imageUrl,
+                }))
+            );
+        }
+
         revalidatePath('/admin/quizzes');
         revalidatePath(`/admin/quizzes/${savedQuiz.id}`);
 
@@ -137,6 +160,7 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
 export async function deleteQuiz(id: string) {
     try {
         await db.delete(questions).where(eq(questions.quizId, id));
+        await db.delete(thankYouPages).where(eq(thankYouPages.quizId, id));
         await db.delete(quizzes).where(eq(quizzes.id, id));
         revalidatePath('/admin/quizzes');
         return { success: true };
