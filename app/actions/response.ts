@@ -24,37 +24,47 @@ export async function submitResponse(data: {
 
         // 1. Save Lead if provided
         if (data.lead && (data.lead.email || data.lead.phone)) {
-            // Check for existing lead
-            const existingLead = await db.query.leads.findFirst({
-                where: (leads, { and, eq }) => and(
-                    eq(leads.quizId, data.quizId),
-                    eq(leads.email, data.lead!.email!)
-                ),
-            });
-
-            if (existingLead) {
-                leadId = existingLead.id;
-                // Optional: Update existing lead with new data
-            } else {
-                const [savedLead] = await db.insert(leads).values({
-                    quizId: data.quizId,
-                    email: data.lead.email,
-                    name: data.lead.name,
-                    phone: data.lead.phone,
-                    country: data.lead.country,
-                    metadata: data.lead.metadata,
-                    hiddenData: data.lead.hiddenData,
-                    score: data.lead.score,
-                    outcome: data.lead.outcome,
-                }).returning({ id: leads.id });
-
-                if (savedLead) {
-                    leadId = savedLead.id;
-                    // Trigger sync (fire and forget or await?)
-                    // For server actions, better to await or use background job.
-                    // We'll await for now to ensure it runs.
-                    await syncLeadToIntegrations(leadId, data.quizId);
+            try {
+                // Check for existing lead
+                let existingLead = undefined;
+                if (data.lead.email) {
+                    existingLead = await db.query.leads.findFirst({
+                        where: (leads, { and, eq }) => and(
+                            eq(leads.quizId, data.quizId),
+                            eq(leads.email, data.lead!.email!)
+                        ),
+                    });
                 }
+
+                if (existingLead) {
+                    leadId = existingLead.id;
+                    // Optional: Update existing lead with new data
+                } else {
+                    const [savedLead] = await db.insert(leads).values({
+                        quizId: data.quizId,
+                        email: data.lead.email || null,
+                        name: data.lead.name || null,
+                        phone: data.lead.phone || null,
+                        country: data.lead.country || null,
+                        metadata: data.lead.metadata || {},
+                        hiddenData: data.lead.hiddenData || {},
+                        score: data.lead.score || 0,
+                        outcome: data.lead.outcome || null,
+                    }).returning({ id: leads.id });
+
+                    if (savedLead) {
+                        leadId = savedLead.id;
+                        // Trigger sync safely
+                        try {
+                            await syncLeadToIntegrations(leadId, data.quizId);
+                        } catch (syncError) {
+                            console.error('Failed to sync lead to integrations:', syncError);
+                        }
+                    }
+                }
+            } catch (leadError) {
+                console.error('Failed to save lead:', leadError);
+                // Continue to save response even if lead save fails
             }
         }
 
