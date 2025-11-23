@@ -9,7 +9,7 @@ async function runMigration() {
     try {
         console.log('🔄 Running database migration...');
 
-        const migrationPath = path.join(process.cwd(), 'drizzle', '0000_flat_nova.sql');
+        const migrationPath = path.join(process.cwd(), 'drizzle', '0002_add_answers_layout.sql');
         const migrationSQL = fs.readFileSync(migrationPath, 'utf-8');
 
         // Split by statement breakpoint and execute each statement

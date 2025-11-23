@@ -232,7 +232,12 @@ export default function QuestionCard({
                             layoutGap === 'sm' ? 'gap-2' :
                                 layoutGap === 'lg' ? 'gap-4' : 'gap-3';
                 }
-                const gridClass = `grid grid-cols-1 ${columns >= 2 ? 'sm:grid-cols-2' : ''} ${columns >= 3 ? 'md:grid-cols-3' : ''} ${columns >= 4 ? 'lg:grid-cols-4' : ''} ${gapClass}`;
+                let gridColsClass = 'grid-cols-1';
+                if (columns === 2) gridColsClass = 'grid-cols-2';
+                if (columns === 3) gridColsClass = 'grid-cols-1 sm:grid-cols-3';
+                if (columns === 4) gridColsClass = 'grid-cols-2 sm:grid-cols-4';
+
+                const gridClass = `grid ${gridColsClass} ${gapClass}`;
 
                 return (
                     <div key="answers" className={`mb-4 sm:mb-6 ${question.type === 'text' ? 'space-y-2 sm:space-y-3' : gridClass}`} style={gapStyle}>
@@ -256,7 +261,7 @@ export default function QuestionCard({
                                 />
                             </form>
                         ) : question.type === 'multi_select' ? (
-                            question.options?.map((option) => {
+                            question.options?.map((option, index) => {
                                 const isSelected = (selectedOptions || []).includes(option.value);
                                 const hasMedia = option.icon || option.imageUrl || option.lucideIcon;
                                 const imageSize = option.imageSize || 'md';
@@ -277,7 +282,7 @@ export default function QuestionCard({
 
                                 return (
                                     <button
-                                        key={option.value}
+                                        key={`${option.value}-${index}`}
                                         onClick={() => {
                                             const current = selectedOptions || [];
                                             const newSelection = isSelected
@@ -320,7 +325,7 @@ export default function QuestionCard({
                                 );
                             })
                         ) : (
-                            question.options?.map((option) => {
+                            question.options?.map((option, index) => {
                                 const isSelected = (selectedOptions || []).includes(option.value);
                                 const hasMedia = option.icon || option.imageUrl || option.lucideIcon;
                                 const imageSize = option.imageSize || 'md';
@@ -341,7 +346,7 @@ export default function QuestionCard({
 
                                 return (
                                     <button
-                                        key={option.value}
+                                        key={`${option.value}-${index}`}
                                         onClick={() => handleSingleChoiceSelection(option.value)}
                                         className={`w-full text-left border-2 transition-all group bg-white min-h-[44px] ${isSelected
                                             ? 'border-blue-500'

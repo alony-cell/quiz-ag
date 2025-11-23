@@ -34,7 +34,9 @@ export default function LeadsTable({ leads }: LeadsTableProps) {
                                             <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
                                                 <Users className="w-4 h-4" />
                                             </div>
-                                            <span className="font-medium text-slate-900">{lead.name || 'Anonymous'}</span>
+                                            <span className="font-medium text-slate-900">
+                                                {lead.firstName || lead.lastName ? `${lead.firstName || ''} ${lead.lastName || ''}`.trim() : 'Anonymous'}
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
@@ -96,7 +98,7 @@ export default function LeadsTable({ leads }: LeadsTableProps) {
                             <div className="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
                                 <div>
                                     <h3 className="text-2xl font-bold text-slate-900 font-heading">
-                                        {selectedLead.name || 'Anonymous'}
+                                        {selectedLead.firstName || selectedLead.lastName ? `${selectedLead.firstName || ''} ${selectedLead.lastName || ''}`.trim() : 'Anonymous'}
                                     </h3>
                                     <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
                                         <span className="flex items-center gap-1">

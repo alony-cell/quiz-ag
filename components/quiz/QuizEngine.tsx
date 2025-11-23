@@ -137,7 +137,8 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
             timeTaken,
             lead: {
                 email: data.email,
-                name: data.firstName,
+                firstName: data.firstName || (data.name ? data.name.split(' ')[0] : null),
+                lastName: data.lastName || (data.name ? data.name.split(' ').slice(1).join(' ') : null),
                 phone: data.phone,
                 country: data.country,
                 metadata: data,

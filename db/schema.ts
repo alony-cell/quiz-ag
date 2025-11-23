@@ -27,6 +27,7 @@ export const questions = pgTable('questions', {
     allowBack: boolean('allow_back').default(false),
     isActive: boolean('is_active').default(true).notNull(),
     buttonText: text('button_text'),
+    answersLayout: jsonb('answers_layout'), // Store grid layout config
     logic: jsonb('logic'), // Store conditional logic
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -48,7 +49,9 @@ export const leads = pgTable('leads', {
     id: uuid('id').defaultRandom().primaryKey(),
     quizId: uuid('quiz_id').references(() => quizzes.id).notNull(),
     email: text('email'),
-    name: text('name'),
+
+    firstName: text('first_name'),
+    lastName: text('last_name'),
     phone: text('phone'),
     country: text('country'), // Country code (e.g., US, GB)
     metadata: jsonb('metadata'), // Any extra info

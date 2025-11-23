@@ -19,7 +19,8 @@ const defaultSettings: QuizSettings = {
         enabled: false,
         fields: [
             { id: 'email', type: 'email', label: 'Email Address', required: true },
-            { id: 'name', type: 'text', label: 'Full Name', required: true },
+            { id: 'firstName', type: 'text', label: 'First Name', required: true },
+            { id: 'lastName', type: 'text', label: 'Last Name', required: true },
         ],
     },
 };

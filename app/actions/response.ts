@@ -10,7 +10,8 @@ export async function submitResponse(data: {
     timeTaken?: number;
     lead?: {
         email?: string;
-        name?: string;
+        firstName?: string;
+        lastName?: string;
         phone?: string;
         country?: string;
         metadata?: any;
@@ -43,7 +44,8 @@ export async function submitResponse(data: {
                     const [savedLead] = await db.insert(leads).values({
                         quizId: data.quizId,
                         email: data.lead.email || null,
-                        name: data.lead.name || null,
+                        firstName: data.lead.firstName || null,
+                        lastName: data.lead.lastName || null,
                         phone: data.lead.phone || null,
                         country: data.lead.country || null,
                         metadata: data.lead.metadata || {},

@@ -136,6 +136,7 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
                         order: index, // Ensure order is preserved
                         options: q.options,
                         structure: q.structure,
+                        answersLayout: q.answersLayout,
                         isRequired: q.isRequired ?? true,
                         allowBack: q.allowBack ?? false,
                         buttonText: q.buttonText,
