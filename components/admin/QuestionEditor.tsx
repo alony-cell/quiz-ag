@@ -2,9 +2,53 @@
 
 import { useState, useEffect } from 'react';
 import { Question, AnswerOption, DesignConfig, QuestionElement } from '@/types';
-import { Plus, Trash2, GripVertical, Eye } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Eye, Heart, Star, Check, X, Circle, Square, Triangle, Zap, Flame, Sparkles, Award, Target, TrendingUp, Shield, Lock, Unlock, Mail, Phone, MapPin, Calendar, Clock, User, Users, Home, Building, Briefcase, ShoppingCart, CreditCard, DollarSign, Gift, Tag, Bookmark, Flag, AlertCircle, Info, HelpCircle, ThumbsUp, ThumbsDown, Smile, Frown, Meh } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QuestionCard from '@/components/quiz/QuestionCard';
+
+const LUCIDE_ICONS = {
+    'Heart': Heart,
+    'Star': Star,
+    'Check': Check,
+    'X': X,
+    'Circle': Circle,
+    'Square': Square,
+    'Triangle': Triangle,
+    'Zap': Zap,
+    'Flame': Flame,
+    'Sparkles': Sparkles,
+    'Award': Award,
+    'Target': Target,
+    'TrendingUp': TrendingUp,
+    'Shield': Shield,
+    'Lock': Lock,
+    'Unlock': Unlock,
+    'Mail': Mail,
+    'Phone': Phone,
+    'MapPin': MapPin,
+    'Calendar': Calendar,
+    'Clock': Clock,
+    'User': User,
+    'Users': Users,
+    'Home': Home,
+    'Building': Building,
+    'Briefcase': Briefcase,
+    'ShoppingCart': ShoppingCart,
+    'CreditCard': CreditCard,
+    'DollarSign': DollarSign,
+    'Gift': Gift,
+    'Tag': Tag,
+    'Bookmark': Bookmark,
+    'Flag': Flag,
+    'AlertCircle': AlertCircle,
+    'Info': Info,
+    'HelpCircle': HelpCircle,
+    'ThumbsUp': ThumbsUp,
+    'ThumbsDown': ThumbsDown,
+    'Smile': Smile,
+    'Frown': Frown,
+    'Meh': Meh,
+};
 
 const defaultQuestionStructure: QuestionElement[] = [
     { id: 'backButton', visible: true, location: 'card', order: 0 },
@@ -299,7 +343,7 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-3">
+                                        <div className="grid grid-cols-3 gap-3">
                                             <div>
                                                 <label className="block text-xs font-medium text-slate-600 mb-1">
                                                     Icon/Emoji (Optional)
@@ -315,6 +359,25 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                                                     className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 border"
                                                     placeholder="😊 or icon URL"
                                                 />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-slate-600 mb-1">
+                                                    Lucide Icon (Optional)
+                                                </label>
+                                                <select
+                                                    value={option.lucideIcon || ''}
+                                                    onChange={(e) => {
+                                                        const newOptions = [...(question.options || [])];
+                                                        newOptions[index] = { ...option, lucideIcon: e.target.value };
+                                                        setQuestion({ ...question, options: newOptions });
+                                                    }}
+                                                    className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 border"
+                                                >
+                                                    <option value="">None</option>
+                                                    {Object.keys(LUCIDE_ICONS).map(iconName => (
+                                                        <option key={iconName} value={iconName}>{iconName}</option>
+                                                    ))}
+                                                </select>
                                             </div>
                                             <div>
                                                 <label className="block text-xs font-medium text-slate-600 mb-1">
@@ -388,6 +451,58 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                                     <Plus className="w-4 h-4 mr-1" />
                                     Add Option
                                 </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Answers Layout */}
+                    {(question.type === 'multiple_choice' || question.type === 'single_choice' || question.type === 'multi_select') && (
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-3">
+                                Answers Layout
+                            </label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        Columns
+                                    </label>
+                                    <select
+                                        value={question.answersLayout?.columns || 1}
+                                        onChange={(e) => setQuestion({
+                                            ...question,
+                                            answersLayout: {
+                                                ...question.answersLayout,
+                                                columns: parseInt(e.target.value)
+                                            }
+                                        })}
+                                        className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2.5 border"
+                                    >
+                                        <option value="1">1 Column</option>
+                                        <option value="2">2 Columns</option>
+                                        <option value="3">3 Columns</option>
+                                        <option value="4">4 Columns</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        Gap Spacing
+                                    </label>
+                                    <select
+                                        value={question.answersLayout?.gap || 'md'}
+                                        onChange={(e) => setQuestion({
+                                            ...question,
+                                            answersLayout: {
+                                                ...question.answersLayout,
+                                                gap: e.target.value as 'sm' | 'md' | 'lg'
+                                            }
+                                        })}
+                                        className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2.5 border"
+                                    >
+                                        <option value="sm">Small</option>
+                                        <option value="md">Medium</option>
+                                        <option value="lg">Large</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     )}

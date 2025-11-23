@@ -4,6 +4,7 @@ export interface AnswerOption {
     value: string;
     label: string;
     icon?: string;        // Icon URL or emoji
+    lucideIcon?: string;  // Lucide icon name (e.g., 'Heart', 'Star', 'Check')
     imageUrl?: string;    // Image URL
     imageSize?: 'sm' | 'md' | 'lg';
     imagePosition?: 'left' | 'right' | 'top' | 'bottom';
@@ -24,6 +25,10 @@ export interface Question {
     isRequired?: boolean;
     allowBack?: boolean;
     structure?: QuestionElement[];
+    answersLayout?: {
+        columns?: number;  // 1, 2, 3, or 4
+        gap?: 'sm' | 'md' | 'lg';
+    };
     logic?: {
         trigger: string; // 'value_equals', etc.
         value: string;
@@ -50,6 +55,7 @@ export interface DesignConfig {
         gradient?: string;
         gradientStart?: string;
         gradientEnd?: string;
+        useGradient?: boolean; // Toggle to enable/disable gradient
         // Phase 1: Enhanced colors
         secondary?: string;
         success?: string;
@@ -100,11 +106,13 @@ export interface DesignConfig {
             color?: string;
             fontSize?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
             alignment?: 'left' | 'center' | 'right';
+            padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | number; // number in rem
         };
         description?: {
             color?: string;
             fontSize?: 'sm' | 'md' | 'lg';
             alignment?: 'left' | 'center' | 'right';
+            padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | number; // number in rem
         };
         answers?: {
             backgroundColor?: string;
@@ -113,11 +121,17 @@ export interface DesignConfig {
             hoverColor?: string;
             selectedColor?: string;
             borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+            padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | number; // number in rem
+            spacing?: 'tight' | 'normal' | 'relaxed' | number; // number in rem (gap)
+            size?: 'sm' | 'md' | 'lg';
         };
         buttons?: {
             backgroundColor?: string;
             textColor?: string;
             borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+            padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | number; // number in rem
+            fontSize?: number; // number in rem
+            size?: 'sm' | 'md' | 'lg';
         };
         // Phase 1: Progress bar
         progressBar?: {
@@ -148,7 +162,23 @@ export interface DesignConfig {
         buttonHoverEffect?: 'lift' | 'glow' | 'scale' | 'none';
         progressBarAnimation?: boolean;
     };
-    // Phase 2: Branding
+    // Phase 2: Header
+    header?: {
+        title?: string;
+        subtitle?: string;
+        backgroundColor?: string;
+        textColor?: string;
+        height?: 'sm' | 'md' | 'lg';
+        logo?: {
+            url: string;
+            position?: 'left' | 'center' | 'right';
+            size?: 'sm' | 'md' | 'lg';
+            link?: string;
+        };
+        showPoweredBy?: boolean;
+        poweredByText?: string;
+    };
+    // Keep branding for backward compatibility
     branding?: {
         logo?: {
             url: string;

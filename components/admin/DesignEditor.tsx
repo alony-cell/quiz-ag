@@ -85,7 +85,7 @@ const themePresets: Record<string, Partial<DesignConfig>> = {
 
 export default function DesignEditor({ quiz, onUpdate }: DesignEditorProps) {
     const [design, setDesign] = useState<DesignConfig>(quiz.design || defaultDesign);
-    const [activeTab, setActiveTab] = useState<'colors' | 'typography' | 'layout' | 'animations' | 'branding' | 'advanced'>('colors');
+    const [activeTab, setActiveTab] = useState<'colors' | 'typography' | 'layout' | 'animations' | 'header' | 'advanced'>('colors');
 
     // Debounce updates to parent
     useEffect(() => {
@@ -133,7 +133,7 @@ export default function DesignEditor({ quiz, onUpdate }: DesignEditorProps) {
                         { id: 'typography', label: 'Typography', icon: Type },
                         { id: 'layout', label: 'Layout', icon: Layout },
                         { id: 'animations', label: 'Effects', icon: Sparkles },
-                        { id: 'branding', label: 'Branding', icon: Tag },
+                        { id: 'header', label: 'Header', icon: Tag },
                         { id: 'advanced', label: 'Advanced', icon: Code },
                     ].map((tab) => (
                         <button
@@ -222,7 +222,18 @@ export default function DesignEditor({ quiz, onUpdate }: DesignEditorProps) {
 
                             {/* Gradient */}
                             <div className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
-                                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Background Gradient</h3>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-base sm:text-lg font-semibold text-slate-900">Background Gradient</h3>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={design.colors.useGradient !== false}
+                                            onChange={(e) => setDesign({ ...design, colors: { ...design.colors, useGradient: e.target.checked } })}
+                                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <span className="text-sm text-slate-600">Enable</span>
+                                    </label>
+                                </div>
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
@@ -490,6 +501,124 @@ export default function DesignEditor({ quiz, onUpdate }: DesignEditorProps) {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Element Spacing & Sizing */}
+                            <div className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Element Spacing & Sizing</h3>
+                                <div className="space-y-6">
+                                    {/* Answer Padding */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Answer Padding: {typeof design.elements?.answers?.padding === 'number' ? `${design.elements.answers.padding}rem` : design.elements?.answers?.padding || 'md'}
+                                        </label>
+                                        <div className="flex items-center gap-3">
+                                            <input
+                                                type="range"
+                                                min="0"
+                                                max="8"
+                                                step="0.25"
+                                                value={typeof design.elements?.answers?.padding === 'number' ? design.elements.answers.padding : 1}
+                                                onChange={(e) => setDesign({ ...design, elements: { ...design.elements, answers: { ...design.elements?.answers, padding: parseFloat(e.target.value) } } })}
+                                                className="flex-1"
+                                            />
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="8"
+                                                step="0.25"
+                                                value={typeof design.elements?.answers?.padding === 'number' ? design.elements.answers.padding : 1}
+                                                onChange={(e) => setDesign({ ...design, elements: { ...design.elements, answers: { ...design.elements?.answers, padding: parseFloat(e.target.value) || 0 } } })}
+                                                className="w-20 rounded-lg border-slate-300 text-sm"
+                                            />
+                                            <span className="text-sm text-slate-500">rem</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Answer Spacing */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Answer Spacing (Gap): {typeof design.elements?.answers?.spacing === 'number' ? `${design.elements.answers.spacing}rem` : design.elements?.answers?.spacing || 'normal'}
+                                        </label>
+                                        <div className="flex items-center gap-3">
+                                            <input
+                                                type="range"
+                                                min="0"
+                                                max="4"
+                                                step="0.125"
+                                                value={typeof design.elements?.answers?.spacing === 'number' ? design.elements.answers.spacing : 0.75}
+                                                onChange={(e) => setDesign({ ...design, elements: { ...design.elements, answers: { ...design.elements?.answers, spacing: parseFloat(e.target.value) } } })}
+                                                className="flex-1"
+                                            />
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="4"
+                                                step="0.125"
+                                                value={typeof design.elements?.answers?.spacing === 'number' ? design.elements.answers.spacing : 0.75}
+                                                onChange={(e) => setDesign({ ...design, elements: { ...design.elements, answers: { ...design.elements?.answers, spacing: parseFloat(e.target.value) || 0 } } })}
+                                                className="w-20 rounded-lg border-slate-300 text-sm"
+                                            />
+                                            <span className="text-sm text-slate-500">rem</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Button Padding */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Button Padding: {typeof design.elements?.buttons?.padding === 'number' ? `${design.elements.buttons.padding}rem` : design.elements?.buttons?.padding || 'md'}
+                                        </label>
+                                        <div className="flex items-center gap-3">
+                                            <input
+                                                type="range"
+                                                min="0.25"
+                                                max="6"
+                                                step="0.25"
+                                                value={typeof design.elements?.buttons?.padding === 'number' ? design.elements.buttons.padding : 1}
+                                                onChange={(e) => setDesign({ ...design, elements: { ...design.elements, buttons: { ...design.elements?.buttons, padding: parseFloat(e.target.value) } } })}
+                                                className="flex-1"
+                                            />
+                                            <input
+                                                type="number"
+                                                min="0.25"
+                                                max="6"
+                                                step="0.25"
+                                                value={typeof design.elements?.buttons?.padding === 'number' ? design.elements.buttons.padding : 1}
+                                                onChange={(e) => setDesign({ ...design, elements: { ...design.elements, buttons: { ...design.elements?.buttons, padding: parseFloat(e.target.value) || 0.5 } } })}
+                                                className="w-20 rounded-lg border-slate-300 text-sm"
+                                            />
+                                            <span className="text-sm text-slate-500">rem</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Button Font Size */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Button Font Size: {design.elements?.buttons?.fontSize ? `${design.elements.buttons.fontSize}rem` : '1rem'}
+                                        </label>
+                                        <div className="flex items-center gap-3">
+                                            <input
+                                                type="range"
+                                                min="0.5"
+                                                max="3"
+                                                step="0.0625"
+                                                value={design.elements?.buttons?.fontSize || 1}
+                                                onChange={(e) => setDesign({ ...design, elements: { ...design.elements, buttons: { ...design.elements?.buttons, fontSize: parseFloat(e.target.value) } } })}
+                                                className="flex-1"
+                                            />
+                                            <input
+                                                type="number"
+                                                min="0.5"
+                                                max="3"
+                                                step="0.0625"
+                                                value={design.elements?.buttons?.fontSize || 1}
+                                                onChange={(e) => setDesign({ ...design, elements: { ...design.elements, buttons: { ...design.elements?.buttons, fontSize: parseFloat(e.target.value) || 1 } } })}
+                                                className="w-20 rounded-lg border-slate-300 text-sm"
+                                            />
+                                            <span className="text-sm text-slate-500">rem</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -591,8 +720,75 @@ export default function DesignEditor({ quiz, onUpdate }: DesignEditorProps) {
                         </div>
                     )}
 
-                    {activeTab === 'branding' && (
+                    {activeTab === 'header' && (
                         <div className="space-y-4">
+                            {/* Header Content */}
+                            <div className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Header Content</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
+                                        <input
+                                            type="text"
+                                            value={design.header?.title || ''}
+                                            onChange={(e) => setDesign({ ...design, header: { ...design.header, title: e.target.value } })}
+                                            placeholder="Welcome to our quiz"
+                                            className="w-full rounded-lg border-slate-300"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Subtitle</label>
+                                        <input
+                                            type="text"
+                                            value={design.header?.subtitle || ''}
+                                            onChange={(e) => setDesign({ ...design, header: { ...design.header, subtitle: e.target.value } })}
+                                            placeholder="Discover your perfect match"
+                                            className="w-full rounded-lg border-slate-300"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Header Styling */}
+                            <div className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Header Styling</h3>
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">Background Color</label>
+                                            <input
+                                                type="color"
+                                                value={design.header?.backgroundColor || design.colors.primary}
+                                                onChange={(e) => setDesign({ ...design, header: { ...design.header, backgroundColor: e.target.value } })}
+                                                className="h-10 w-full rounded-lg border border-slate-200 cursor-pointer"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">Text Color</label>
+                                            <input
+                                                type="color"
+                                                value={design.header?.textColor || '#ffffff'}
+                                                onChange={(e) => setDesign({ ...design, header: { ...design.header, textColor: e.target.value } })}
+                                                className="h-10 w-full rounded-lg border border-slate-200 cursor-pointer"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Height</label>
+                                        <select
+                                            value={design.header?.height || 'md'}
+                                            onChange={(e) => setDesign({ ...design, header: { ...design.header, height: e.target.value as any } })}
+                                            className="w-full rounded-lg border-slate-300"
+                                        >
+                                            <option value="sm">Small</option>
+                                            <option value="md">Medium</option>
+                                            <option value="lg">Large</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Logo */}
                             <div className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
                                 <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Logo</h3>
                                 <div className="space-y-4">
@@ -600,31 +796,31 @@ export default function DesignEditor({ quiz, onUpdate }: DesignEditorProps) {
                                         <label className="block text-sm font-medium text-slate-700 mb-1">Logo URL</label>
                                         <input
                                             type="text"
-                                            value={design.branding?.logo?.url || ''}
-                                            onChange={(e) => setDesign({ ...design, branding: { ...design.branding, logo: { ...design.branding?.logo, url: e.target.value } } })}
+                                            value={design.header?.logo?.url || ''}
+                                            onChange={(e) => setDesign({ ...design, header: { ...design.header, logo: { ...design.header?.logo, url: e.target.value } } })}
                                             placeholder="https://example.com/logo.png"
                                             className="w-full rounded-lg border-slate-300"
                                         />
                                     </div>
-                                    {design.branding?.logo?.url && (
+                                    {design.header?.logo?.url && (
                                         <>
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-700 mb-1">Position</label>
                                                 <select
-                                                    value={design.branding?.logo?.position || 'top-center'}
-                                                    onChange={(e) => setDesign({ ...design, branding: { ...design.branding, logo: { ...design.branding?.logo, position: e.target.value as any, url: design.branding?.logo?.url || '' } } })}
+                                                    value={design.header?.logo?.position || 'center'}
+                                                    onChange={(e) => setDesign({ ...design, header: { ...design.header, logo: { ...design.header?.logo, position: e.target.value as any, url: design.header?.logo?.url || '' } } })}
                                                     className="w-full rounded-lg border-slate-300"
                                                 >
-                                                    <option value="top-left">Top Left</option>
-                                                    <option value="top-center">Top Center</option>
-                                                    <option value="top-right">Top Right</option>
+                                                    <option value="left">Left</option>
+                                                    <option value="center">Center</option>
+                                                    <option value="right">Right</option>
                                                 </select>
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-700 mb-1">Size</label>
                                                 <select
-                                                    value={design.branding?.logo?.size || 'md'}
-                                                    onChange={(e) => setDesign({ ...design, branding: { ...design.branding, logo: { ...design.branding?.logo, size: e.target.value as any, url: design.branding?.logo?.url || '' } } })}
+                                                    value={design.header?.logo?.size || 'md'}
+                                                    onChange={(e) => setDesign({ ...design, header: { ...design.header, logo: { ...design.header?.logo, size: e.target.value as any, url: design.header?.logo?.url || '' } } })}
                                                     className="w-full rounded-lg border-slate-300"
                                                 >
                                                     <option value="sm">Small (32px)</option>
@@ -703,7 +899,7 @@ export default function DesignEditor({ quiz, onUpdate }: DesignEditorProps) {
                     className="p-6 sm:p-8 rounded-3xl transition-all duration-300 border border-slate-200 shadow-sm"
                     style={{
                         backgroundColor: design.colors.background,
-                        backgroundImage: design.colors.gradient,
+                        backgroundImage: design.colors.useGradient !== false ? design.colors.gradient : undefined,
                     }}
                 >
                     {/* Logo Preview */}
@@ -770,12 +966,30 @@ export default function DesignEditor({ quiz, onUpdate }: DesignEditorProps) {
                         >
                             This is how your quiz will look to your visitors.
                         </p>
-                        <div className="space-y-3">
+                        <div
+                            className="flex flex-col"
+                            style={
+                                typeof design.elements?.answers?.spacing === 'number'
+                                    ? { gap: `${design.elements.answers.spacing}rem` }
+                                    : {}
+                            }
+                        >
                             {[1, 2].map((i) => (
                                 <div
                                     key={i}
-                                    className="p-3 sm:p-4 rounded-lg border-2 transition-all cursor-pointer"
+                                    className="rounded-lg border-2 transition-all cursor-pointer"
                                     style={{
+                                        padding: typeof design.elements?.answers?.padding === 'number'
+                                            ? `${design.elements.answers.padding}rem`
+                                            : undefined,
+                                        // fallback Tailwind padding classes for enum values
+                                        ...(typeof design.elements?.answers?.padding !== 'number' && {
+                                            padding: design.elements?.answers?.padding === 'none' ? '0' :
+                                                design.elements?.answers?.padding === 'sm' ? '0.5rem' :
+                                                    design.elements?.answers?.padding === 'lg' ? '1rem' :
+                                                        design.elements?.answers?.padding === 'xl' ? '1.5rem' :
+                                                            '0.75rem', // default md
+                                        }),
                                         borderColor: i === 1 ? design.colors.primary : '#e2e8f0',
                                         backgroundColor: i === 1 ? `${design.colors.primary}10` : 'transparent',
                                     }}
@@ -785,10 +999,25 @@ export default function DesignEditor({ quiz, onUpdate }: DesignEditorProps) {
                             ))}
                         </div>
                         <button
-                            className="w-full mt-6 py-3 px-4 rounded-lg font-medium text-white transition-all"
+                            className="w-full mt-6 rounded-lg font-medium text-white transition-all"
                             style={{
                                 backgroundColor: design.colors.primary,
                                 borderRadius: design.layout.borderRadius === 'full' ? '9999px' : '0.5rem',
+                                // Padding & font size handling
+                                ...(typeof design.elements?.buttons?.padding === 'number' || typeof design.elements?.buttons?.fontSize === 'number'
+                                    ? {
+                                        paddingTop: `${(typeof design.elements?.buttons?.padding === 'number' ? design.elements.buttons.padding : 1) * 0.75}rem`,
+                                        paddingBottom: `${(typeof design.elements?.buttons?.padding === 'number' ? design.elements.buttons.padding : 1) * 0.75}rem`,
+                                        paddingLeft: `${(typeof design.elements?.buttons?.padding === 'number' ? design.elements.buttons.padding : 1) * 1.5}rem`,
+                                        paddingRight: `${(typeof design.elements?.buttons?.padding === 'number' ? design.elements.buttons.padding : 1) * 1.5}rem`,
+                                        fontSize: `${design.elements?.buttons?.fontSize || 1}rem`,
+                                    }
+                                    : {
+                                        // fallback to enum size classes
+                                        ...(design.elements?.buttons?.size === 'sm' && { padding: '0.5rem 1rem', fontSize: '0.875rem' }),
+                                        ...(design.elements?.buttons?.size === 'lg' && { padding: '1rem 2rem', fontSize: '1.125rem' }),
+                                        ...((!design.elements?.buttons?.size || design.elements?.buttons?.size === 'md') && { padding: '0.75rem 1.5rem', fontSize: '1rem' }),
+                                    })
                             }}
                         >
                             Continue
@@ -796,6 +1025,6 @@ export default function DesignEditor({ quiz, onUpdate }: DesignEditorProps) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

@@ -1,5 +1,6 @@
 import { Question, DesignConfig } from '@/types';
 import { motion } from 'framer-motion';
+import * as LucideIcons from 'lucide-react';
 
 interface QuestionCardProps {
     question: Question;
@@ -44,6 +45,44 @@ export default function QuestionCard({
             return `${base} ${radius} ${shadow} ${padding} bg-white border border-slate-100`;
         }
         return `${base} ${radius} ${padding} bg-transparent border-2 border-slate-200`;
+    };
+
+    const getAnswerPadding = () => {
+        const padding = design.elements?.answers?.padding;
+
+        // If it's a number, use it directly as rem
+        if (typeof padding === 'number') {
+            return `p-[${padding}rem]`;
+        }
+
+        // Otherwise, handle old enum values
+        switch (padding) {
+            case 'none': return 'p-0';
+            case 'sm': return 'p-2 sm:p-3';
+            case 'lg': return 'p-4 sm:p-6';
+            case 'xl': return 'p-6 sm:p-8';
+            default: return 'p-3 sm:p-4'; // 'md' or undefined
+        }
+    };
+
+    const getButtonSize = () => {
+        const padding = design.elements?.buttons?.padding;
+        const fontSize = design.elements?.buttons?.fontSize;
+        const size = design.elements?.buttons?.size;
+
+        // If we have numerical values, use them
+        if (typeof padding === 'number' || typeof fontSize === 'number') {
+            const paddingValue = typeof padding === 'number' ? padding : 1;
+            const fontSizeValue = typeof fontSize === 'number' ? fontSize : 1;
+            return `py-[${paddingValue * 0.75}rem] px-[${paddingValue * 1.5}rem] text-[${fontSizeValue}rem]`;
+        }
+
+        // Otherwise, handle old enum values
+        switch (size) {
+            case 'sm': return 'py-2 px-4 text-sm';
+            case 'lg': return 'py-4 px-8 text-lg';
+            default: return 'py-3 px-6 text-base';
+        }
     };
 
     const cardInlineStyle = design.layout.cardStyle === 'glass' ? {
@@ -177,8 +216,26 @@ export default function QuestionCard({
 
             case 'answers':
                 if (question.type === 'content') return null; // Content type doesn't have answers block, just button
+
+                // Grid layout configuration
+                const columns = question.answersLayout?.columns || 1;
+                const layoutGap = question.answersLayout?.gap || 'md';
+                const spacingSetting = design.elements?.answers?.spacing;
+                // Determine gap class or style
+                let gapClass = '';
+                let gapStyle = {};
+                if (typeof spacingSetting === 'number') {
+                    gapStyle = { gap: `${spacingSetting}rem` };
+                } else {
+                    gapClass = spacingSetting === 'tight' ? 'gap-2' :
+                        spacingSetting === 'relaxed' ? 'gap-4' :
+                            layoutGap === 'sm' ? 'gap-2' :
+                                layoutGap === 'lg' ? 'gap-4' : 'gap-3';
+                }
+                const gridClass = `grid grid-cols-1 ${columns >= 2 ? 'sm:grid-cols-2' : ''} ${columns >= 3 ? 'md:grid-cols-3' : ''} ${columns >= 4 ? 'lg:grid-cols-4' : ''} ${gapClass}`;
+
                 return (
-                    <div key="answers" className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                    <div key="answers" className={`mb-4 sm:mb-6 ${question.type === 'text' ? 'space-y-2 sm:space-y-3' : gridClass}`} style={gapStyle}>
                         {question.type === 'text' ? (
                             <form
                                 onSubmit={(e) => {
@@ -201,7 +258,7 @@ export default function QuestionCard({
                         ) : question.type === 'multi_select' ? (
                             question.options?.map((option) => {
                                 const isSelected = (selectedOptions || []).includes(option.value);
-                                const hasMedia = option.icon || option.imageUrl;
+                                const hasMedia = option.icon || option.imageUrl || option.lucideIcon;
                                 const imageSize = option.imageSize || 'md';
                                 const imagePosition = option.imagePosition || 'left';
 
@@ -215,6 +272,9 @@ export default function QuestionCard({
                                     imagePosition === 'bottom' ? 'flex-col-reverse' :
                                         imagePosition === 'right' ? 'flex-row-reverse' : 'flex-row';
 
+                                // Get Lucide icon component
+                                const LucideIcon = option.lucideIcon ? (LucideIcons as any)[option.lucideIcon] : null;
+
                                 return (
                                     <button
                                         key={option.value}
@@ -225,7 +285,7 @@ export default function QuestionCard({
                                                 : [...current, option.value];
                                             onSelectionChange?.(newSelection);
                                         }}
-                                        className={`w-full p-3 sm:p-4 text-left border-2 transition-all flex items-center justify-between group bg-white min-h-[44px] ${isSelected
+                                        className={`w-full ${getAnswerPadding()} text-left border-2 transition-all flex items-center justify-between group bg-white min-h-[44px] ${isSelected
                                             ? 'border-blue-500'
                                             : 'border-slate-200 hover:border-blue-300'
                                             }`}
@@ -240,6 +300,8 @@ export default function QuestionCard({
                                                             alt={option.label}
                                                             className={`${sizeClasses[imageSize]} object-cover rounded`}
                                                         />
+                                                    ) : LucideIcon ? (
+                                                        <LucideIcon className={sizeClasses[imageSize]} style={{ color: design.colors.primary }} />
                                                     ) : option.icon ? (
                                                         <span className="text-2xl">{option.icon}</span>
                                                     ) : null}
@@ -260,7 +322,7 @@ export default function QuestionCard({
                         ) : (
                             question.options?.map((option) => {
                                 const isSelected = (selectedOptions || []).includes(option.value);
-                                const hasMedia = option.icon || option.imageUrl;
+                                const hasMedia = option.icon || option.imageUrl || option.lucideIcon;
                                 const imageSize = option.imageSize || 'md';
                                 const imagePosition = option.imagePosition || 'left';
 
@@ -274,15 +336,28 @@ export default function QuestionCard({
                                     imagePosition === 'bottom' ? 'flex-col-reverse' :
                                         imagePosition === 'right' ? 'flex-row-reverse' : 'flex-row';
 
+                                // Get Lucide icon component
+                                const LucideIcon = option.lucideIcon ? (LucideIcons as any)[option.lucideIcon] : null;
+
                                 return (
                                     <button
                                         key={option.value}
                                         onClick={() => handleSingleChoiceSelection(option.value)}
-                                        className={`w-full p-3 sm:p-4 text-left border-2 transition-all group bg-white min-h-[44px] ${isSelected
+                                        className={`w-full text-left border-2 transition-all group bg-white min-h-[44px] ${isSelected
                                             ? 'border-blue-500'
                                             : 'border-slate-200 hover:border-blue-300'
+                                            } ${design.elements?.answers?.padding === 'none' ? 'p-0' :
+                                                design.elements?.answers?.padding === 'sm' ? 'p-2 sm:p-3' :
+                                                    design.elements?.answers?.padding === 'lg' ? 'p-4 sm:p-6' :
+                                                        design.elements?.answers?.padding === 'xl' ? 'p-6 sm:p-8' :
+                                                            'p-3 sm:p-4'
                                             }`}
-                                        style={getAnswerStyle(isSelected)}
+                                        style={{
+                                            ...getAnswerStyle(isSelected),
+                                            padding: typeof design.elements?.answers?.padding === 'number'
+                                                ? `${design.elements.answers.padding}rem`
+                                                : undefined,
+                                        }}
                                     >
                                         <div className={`flex items-center gap-3 ${flexDirection} ${imagePosition === 'top' || imagePosition === 'bottom' ? 'w-full text-center' : ''}`}>
                                             {hasMedia && (
@@ -293,6 +368,8 @@ export default function QuestionCard({
                                                             alt={option.label}
                                                             className={`${sizeClasses[imageSize]} object-cover rounded`}
                                                         />
+                                                    ) : LucideIcon ? (
+                                                        <LucideIcon className={sizeClasses[imageSize]} style={{ color: design.colors.primary }} />
                                                     ) : option.icon ? (
                                                         <span className="text-2xl">{option.icon}</span>
                                                     ) : null}
@@ -314,7 +391,7 @@ export default function QuestionCard({
                         <button
                             key="button"
                             onClick={() => onAnswer(question.id, 'continue')}
-                            className="w-full py-3 sm:py-4 px-6 font-semibold text-base sm:text-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg min-h-[44px]"
+                            className={`w-full ${getButtonSize()} font-semibold transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg min-h-[44px]`}
                             style={getButtonStyle()}
                         >
                             {question.buttonText || 'Continue'}
@@ -351,7 +428,7 @@ export default function QuestionCard({
                                     }
                                 }}
                                 disabled={isNextDisabled() && question.isRequired !== false}
-                                className="flex-1 py-3 px-4 sm:px-6 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] text-sm sm:text-base"
+                                className={`flex-1 ${getButtonSize()} font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]`}
                                 style={getButtonStyle()}
                             >
                                 {question.buttonText || (question.type === 'text' ? 'Next' : 'Continue')}

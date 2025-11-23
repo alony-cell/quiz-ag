@@ -188,7 +188,7 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
     // Show lead form if quiz state is lead_capture
     if (quizState === 'lead_capture') {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8" style={{ backgroundColor: design.colors.background, backgroundImage: design.colors.gradient }}>
+            <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8" style={{ backgroundColor: design.colors.background, backgroundImage: design.colors.useGradient !== false ? design.colors.gradient : undefined }}>
                 <LeadForm
                     fields={quiz.settings?.leadCapture.fields}
                     onSubmit={handleLeadSubmit}
@@ -234,51 +234,95 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
 
     // Main quiz view
     return (
-        <div className="min-h-screen flex items-start justify-center p-4 sm:p-6 lg:p-8 pt-8 md:pt-12" style={{ backgroundColor: design.colors.background, backgroundImage: design.colors.gradient }} {...fontStyle}>
-            <div className="max-w-2xl mx-auto px-2 sm:px-0 w-full" style={fontStyle}>
-                {/* Progress Bar */}
-                <div className="mb-6 sm:mb-8">
-                    <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                        <motion.div
-                            className="h-full"
-                            style={{ backgroundColor: design.colors.primary }}
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progress}%` }}
-                            transition={{ duration: 0.5 }}
-                        />
+        <div className="min-h-screen flex flex-col items-start justify-start" style={{ backgroundColor: design.colors.background, backgroundImage: design.colors.useGradient !== false ? design.colors.gradient : undefined }} {...fontStyle}>
+            {/* Header */}
+            {design.header && (design.header.title || design.header.subtitle || design.header.logo) && (
+                <div
+                    className={`w-full ${design.header.height === 'sm' ? 'py-4' :
+                        design.header.height === 'lg' ? 'py-12' :
+                            'py-8'
+                        }`}
+                    style={{
+                        backgroundColor: design.header.backgroundColor || design.colors.primary,
+                        color: design.header.textColor || '#ffffff'
+                    }}
+                >
+                    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className={`flex items-center gap-4 ${design.header.logo?.position === 'left' ? 'justify-start' :
+                            design.header.logo?.position === 'right' ? 'justify-end' :
+                                'justify-center'
+                            }`}>
+                            {design.header.logo?.url && (
+                                <img
+                                    src={design.header.logo.url}
+                                    alt="Logo"
+                                    className={`${design.header.logo.size === 'sm' ? 'h-8' :
+                                        design.header.logo.size === 'lg' ? 'h-16' :
+                                            'h-12'
+                                        }`}
+                                />
+                            )}
+                            {(design.header.title || design.header.subtitle) && (
+                                <div className="text-center">
+                                    {design.header.title && (
+                                        <h1 className="text-2xl sm:text-3xl font-bold">{design.header.title}</h1>
+                                    )}
+                                    {design.header.subtitle && (
+                                        <p className="text-sm sm:text-base opacity-90 mt-1">{design.header.subtitle}</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    <p className="text-xs sm:text-sm mt-2 text-right font-medium" style={{ color: design.colors.text, opacity: 0.7 }}>
-                        Question {currentStep + 1} of {questions.length}
-                    </p>
                 </div>
+            )}
 
-                {/* Question Card */}
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={currentQuestion.id}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.3 }}
-                        className="w-full"
-                    >
-                        <QuestionCard
-                            question={currentQuestion}
-                            design={design}
-                            onAnswer={handleAnswer}
-                            selectedOptions={selectedOptions[currentQuestion.id] || []}
-                            textAnswer={textAnswer}
-                            onTextAnswerChange={setTextAnswer}
-                            onSelectionChange={(newSelection) => {
-                                setSelectedOptions({
-                                    ...selectedOptions,
-                                    [currentQuestion.id]: newSelection
-                                });
-                            }}
-                            onBack={currentStep > 0 ? () => setCurrentStep(currentStep - 1) : undefined}
-                        />
-                    </motion.div>
-                </AnimatePresence>
+            <div className="flex-1 flex items-start justify-center p-4 sm:p-6 lg:p-8 pt-8 md:pt-12 w-full">
+                <div className="max-w-2xl mx-auto px-2 sm:px-0 w-full" style={fontStyle}>
+                    {/* Progress Bar */}
+                    <div className="mb-6 sm:mb-8">
+                        <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <motion.div
+                                className="h-full"
+                                style={{ backgroundColor: design.colors.primary }}
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progress}%` }}
+                                transition={{ duration: 0.5 }}
+                            />
+                        </div>
+                        <p className="text-xs sm:text-sm mt-2 text-right font-medium" style={{ color: design.colors.text, opacity: 0.7 }}>
+                            Question {currentStep + 1} of {questions.length}
+                        </p>
+                    </div>
+
+                    {/* Question Card */}
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={currentQuestion.id}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.3 }}
+                            className="w-full"
+                        >
+                            <QuestionCard
+                                question={currentQuestion}
+                                design={design}
+                                onAnswer={handleAnswer}
+                                selectedOptions={selectedOptions[currentQuestion.id] || []}
+                                textAnswer={textAnswer}
+                                onTextAnswerChange={setTextAnswer}
+                                onSelectionChange={(newSelection) => {
+                                    setSelectedOptions({
+                                        ...selectedOptions,
+                                        [currentQuestion.id]: newSelection
+                                    });
+                                }}
+                                onBack={currentStep > 0 ? () => setCurrentStep(currentStep - 1) : undefined}
+                            />
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
             </div>
         </div>
     );
