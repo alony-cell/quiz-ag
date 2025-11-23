@@ -158,7 +158,7 @@ export default function QuizManager({ initialQuiz }: QuizManagerProps) {
                     <LeadFormEditor quiz={quiz} onUpdate={handleUpdateSettings} />
                 )}
                 {activeTab === 'integrations' && (
-                    <HubSpotIntegration quizId={quiz.id} />
+                    <HubSpotIntegration quizId={quiz.id} quiz={quiz} />
                 )}
                 {activeTab === 'outcomes' && (
                     <ThankYouEditor

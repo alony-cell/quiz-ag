@@ -62,8 +62,32 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
         // Reset local state
         setTextAnswer('');
 
-        if (currentStep < questions.length - 1) {
-            setTimeout(() => setCurrentStep(currentStep + 1), 300);
+        // Check for conditional logic
+        const currentQ = questions[currentStep];
+        let nextStep = currentStep + 1;
+
+        if (currentQ?.logic && currentQ.logic.length > 0) {
+            // Evaluate logic rules
+            const answerValue = Array.isArray(value) ? value[0] : value; // For multi-select, use first value
+
+            for (const rule of currentQ.logic) {
+                const matches = rule.condition === 'is'
+                    ? answerValue === rule.value
+                    : answerValue !== rule.value;
+
+                if (matches && rule.action === 'jump_to' && rule.target) {
+                    // Find the target question index
+                    const targetIndex = questions.findIndex(q => q.id === rule.target);
+                    if (targetIndex !== -1) {
+                        nextStep = targetIndex;
+                        break; // Use first matching rule
+                    }
+                }
+            }
+        }
+
+        if (nextStep < questions.length) {
+            setTimeout(() => setCurrentStep(nextStep), 300);
         } else {
             setTimeout(() => setQuizState('lead_capture'), 300);
         }

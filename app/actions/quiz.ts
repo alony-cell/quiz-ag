@@ -137,6 +137,7 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
                         options: q.options,
                         structure: q.structure,
                         answersLayout: q.answersLayout,
+                        logic: q.logic,
                         isRequired: q.isRequired ?? true,
                         allowBack: q.allowBack ?? false,
                         buttonText: q.buttonText,

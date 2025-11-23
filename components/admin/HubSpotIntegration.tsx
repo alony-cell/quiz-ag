@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import { getIntegrations, saveIntegration } from '@/app/actions/integration';
 
-import type { HubSpotIntegration, Integration } from '@/types';
+import type { HubSpotIntegration, Integration, Quiz } from '@/types';
 interface Mapping {
     source: string;
     hubspot: string;
 }
 
-export default function HubSpotIntegration({ quizId }: { quizId: string }) {
+export default function HubSpotIntegration({ quizId, quiz }: { quizId: string; quiz: Quiz }) {
     const [portalId, setPortalId] = useState('');
     const [formGuid, setFormGuid] = useState('');
     const [mappings, setMappings] = useState<Mapping[]>([]);
@@ -66,6 +66,35 @@ export default function HubSpotIntegration({ quizId }: { quizId: string }) {
         }
         setIsSaving(false);
     };
+
+    // Build list of available source fields
+    const availableFields: { value: string; label: string; group: string }[] = [
+        // Questions
+        ...(quiz.questions || []).map(q => ({
+            value: `question_${q.id}`,
+            label: q.text || `Question ${q.order + 1}`,
+            group: 'Questions'
+        })),
+        // Lead form fields
+        ...(quiz.settings?.leadCapture?.fields || []).map(f => ({
+            value: `field_${f.id}`,
+            label: f.label,
+            group: 'Form Fields'
+        })),
+        // Hidden fields
+        ...(quiz.settings?.leadCapture?.hiddenFields || []).map(h => ({
+            value: `hidden_${h.id}`,
+            label: h.name,
+            group: 'Hidden Fields'
+        }))
+    ];
+
+    // Group fields by category
+    const groupedFields = availableFields.reduce((acc, field) => {
+        if (!acc[field.group]) acc[field.group] = [];
+        acc[field.group].push(field);
+        return acc;
+    }, {} as Record<string, typeof availableFields>);
 
     return (
         <div className="max-w-4xl mx-auto">
@@ -137,13 +166,22 @@ export default function HubSpotIntegration({ quizId }: { quizId: string }) {
                                 <div key={idx} className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200 group">
                                     <div className="flex-1">
                                         <label className="block text-xs font-medium text-slate-500 mb-1">Source Field</label>
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. email"
+                                        <select
                                             value={m.source}
                                             onChange={e => updateMapping(idx, 'source', e.target.value)}
                                             className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        />
+                                        >
+                                            <option value="">Select a field...</option>
+                                            {Object.entries(groupedFields).map(([group, fields]) => (
+                                                <optgroup key={group} label={group}>
+                                                    {fields.map(field => (
+                                                        <option key={field.value} value={field.value}>
+                                                            {field.label}
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="text-slate-400">→</div>
                                     <div className="flex-1">

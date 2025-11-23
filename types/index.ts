@@ -30,10 +30,10 @@ export interface Question {
         gap?: 'sm' | 'md' | 'lg';
     };
     logic?: {
-        trigger: string; // 'value_equals', etc.
-        value: string;
+        condition: 'is' | 'isnt';  // 'is' = equals, 'isnt' = not equals
+        value: string;              // The answer value to compare
         action: 'jump_to';
-        target: string; // questionId
+        target: string;             // questionId to jump to
     }[];
 }
 

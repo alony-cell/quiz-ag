@@ -66,6 +66,7 @@ export default function QuestionList({ questions, design, onUpdate }: QuestionLi
                                 <QuestionEditor
                                     initialQuestion={question}
                                     design={design}
+                                    allQuestions={questions}
                                     onSave={handleSaveQuestion}
                                     onCancel={() => setEditingId(null)}
                                 />
@@ -117,6 +118,7 @@ export default function QuestionList({ questions, design, onUpdate }: QuestionLi
                     >
                         <QuestionEditor
                             design={design}
+                            allQuestions={questions}
                             onSave={handleSaveQuestion}
                             onCancel={() => setIsCreating(false)}
                         />

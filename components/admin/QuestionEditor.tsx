@@ -73,11 +73,12 @@ const normalizeStructureOrders = (structure: QuestionElement[]): QuestionElement
 interface QuestionEditorProps {
     initialQuestion?: Partial<Question>;
     design?: DesignConfig;
+    allQuestions?: Question[];  // All questions in the quiz for logic dropdown
     onSave: (question: Question) => void;
     onCancel: () => void;
 }
 
-export default function QuestionEditor({ initialQuestion, design, onSave, onCancel }: QuestionEditorProps) {
+export default function QuestionEditor({ initialQuestion, design, allQuestions = [], onSave, onCancel }: QuestionEditorProps) {
     const [question, setQuestion] = useState<Partial<Question>>({
         text: '',
         type: 'multiple_choice',
@@ -140,72 +141,76 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
                             Question Text
                         </label>
                         <input
                             type="text"
-                            value={question.text}
+                            value={question.text || ''}
                             onChange={(e) => setQuestion({ ...question, text: e.target.value })}
-                            className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2.5 border"
-                            placeholder="e.g., What is your biggest challenge?"
+                            className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-slate-900 focus:ring-slate-900 sm:text-sm p-3 border"
+                            placeholder="New Question"
                             autoFocus
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                        <label className="block text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">
                             Question Type
                         </label>
-                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        <div className="flex flex-wrap gap-2">
                             {[
-                                { id: 'multiple_choice', label: 'Multiple Choice' },
-                                { id: 'single_choice', label: 'Single Choice' },
-                                { id: 'multi_select', label: 'Multi-Select' },
-                                { id: 'true_false', label: 'True / False' },
-                                { id: 'yes_no', label: 'Yes / No' },
-                                { id: 'rating', label: 'Rating (1-5)' },
-                                { id: 'scale', label: 'Scale (1-10)' },
-                                { id: 'text', label: 'Text Input' },
-                                { id: 'content', label: 'Content Card' },
-                                { id: 'testimonial', label: 'Testimonial' },
-                                { id: 'product', label: 'Product' },
-                            ].map((type) => (
-                                <button
-                                    key={type.id}
-                                    type="button"
-                                    onClick={() => {
-                                        let newOptions = question.options;
-                                        if (type.id === 'true_false') {
-                                            newOptions = [
-                                                { value: 'true', label: 'True', score: 1 },
-                                                { value: 'false', label: 'False', score: 0 },
-                                            ];
-                                        } else if (type.id === 'yes_no') {
-                                            newOptions = [
-                                                { value: 'yes', label: 'Yes', score: 1 },
-                                                { value: 'no', label: 'No', score: 0 },
-                                            ];
-                                        } else if (['rating', 'content', 'testimonial', 'product', 'scale'].includes(type.id)) {
-                                            newOptions = [];
-                                        }
-                                        setQuestion({ ...question, type: type.id as any, options: newOptions });
-                                    }}
-                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors border ${question.type === type.id
-                                        ? 'bg-blue-100 text-blue-700 border-blue-200'
-                                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                                        }`}
-                                >
-                                    {type.label}
-                                </button>
-                            ))}
+                                { id: 'single_choice', label: 'Single Choice', icon: Circle },
+                                { id: 'multiple_choice', label: 'Multiple Choice', icon: Check },
+                                { id: 'text', label: 'Text Input', icon: Mail },
+                                { id: 'scale', label: 'Scale', icon: TrendingUp },
+                                { id: 'testimonial', label: 'Testimonial', icon: Star },
+                                { id: 'multi_select', label: 'Multi-Select', icon: Square },
+                                { id: 'true_false', label: 'True / False', icon: Check },
+                                { id: 'yes_no', label: 'Yes / No', icon: ThumbsUp },
+                                { id: 'rating', label: 'Rating', icon: Star },
+                                { id: 'content', label: 'Content', icon: Info },
+                                { id: 'product', label: 'Product', icon: ShoppingCart },
+                            ].map((type) => {
+                                const Icon = type.icon;
+                                return (
+                                    <button
+                                        key={type.id}
+                                        type="button"
+                                        onClick={() => {
+                                            let newOptions = question.options;
+                                            if (type.id === 'true_false') {
+                                                newOptions = [
+                                                    { value: 'true', label: 'True', score: 1 },
+                                                    { value: 'false', label: 'False', score: 0 },
+                                                ];
+                                            } else if (type.id === 'yes_no') {
+                                                newOptions = [
+                                                    { value: 'yes', label: 'Yes', score: 1 },
+                                                    { value: 'no', label: 'No', score: 0 },
+                                                ];
+                                            } else if (['rating', 'content', 'testimonial', 'product', 'scale'].includes(type.id)) {
+                                                newOptions = [];
+                                            }
+                                            setQuestion({ ...question, type: type.id as any, options: newOptions });
+                                        }}
+                                        className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all border ${question.type === type.id
+                                            ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                                            : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                            }`}
+                                    >
+                                        <Icon className="w-4 h-4" />
+                                        {type.label}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
 
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">
-                                Description (Optional)
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Subtitle (Optional)
                             </label>
                             <textarea
                                 value={question.description || ''}
@@ -272,8 +277,8 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
 
                     {(question.type === 'multiple_choice' || question.type === 'single_choice' || question.type === 'multi_select') && (
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-3">
-                                Answer Options
+                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
+                                ANSWERS
                             </label>
                             <div className="space-y-3">
                                 {question.options?.map((option, index) => (
@@ -507,6 +512,95 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                         </div>
                     )}
 
+                    {/* Conditional Logic */}
+                    {(question.type === 'multiple_choice' || question.type === 'single_choice' || question.type === 'true_false' || question.type === 'yes_no') && question.options && question.options.length > 0 && (
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-3">
+                                Conditional Logic
+                            </label>
+                            <div className="space-y-3">
+                                {(question.logic || []).map((rule, index) => (
+                                    <div key={index} className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                        <span className="text-sm text-slate-600">If answer</span>
+                                        <select
+                                            value={rule.condition}
+                                            onChange={(e) => {
+                                                const newLogic = [...(question.logic || [])];
+                                                newLogic[index] = { ...rule, condition: e.target.value as 'is' | 'isnt' };
+                                                setQuestion({ ...question, logic: newLogic });
+                                            }}
+                                            className="px-2 py-1 border border-slate-300 rounded text-sm"
+                                        >
+                                            <option value="is">is</option>
+                                            <option value="isnt">isn't</option>
+                                        </select>
+                                        <select
+                                            value={rule.value}
+                                            onChange={(e) => {
+                                                const newLogic = [...(question.logic || [])];
+                                                newLogic[index] = { ...rule, value: e.target.value };
+                                                setQuestion({ ...question, logic: newLogic });
+                                            }}
+                                            className="px-2 py-1 border border-slate-300 rounded text-sm flex-1"
+                                        >
+                                            <option value="">Select answer...</option>
+                                            {question.options?.map((opt, optIndex) => (
+                                                <option key={`${opt.value}-${optIndex}`} value={opt.value}>
+                                                    {opt.label || opt.value}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <span className="text-sm text-slate-600">go to</span>
+                                        <select
+                                            value={rule.target}
+                                            onChange={(e) => {
+                                                const newLogic = [...(question.logic || [])];
+                                                newLogic[index] = { ...rule, target: e.target.value };
+                                                setQuestion({ ...question, logic: newLogic });
+                                            }}
+                                            className="px-2 py-1 border border-slate-300 rounded text-sm flex-1"
+                                        >
+                                            <option value="">Select question...</option>
+                                            {allQuestions
+                                                .filter(q => q.id !== question.id)
+                                                .map((q) => (
+                                                    <option key={q.id} value={q.id}>
+                                                        {q.text || `Question ${q.order + 1}`}
+                                                    </option>
+                                                ))}
+                                        </select>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newLogic = (question.logic || []).filter((_, i) => i !== index);
+                                                setQuestion({ ...question, logic: newLogic.length > 0 ? newLogic : undefined });
+                                            }}
+                                            className="p-1 text-red-600 hover:bg-red-50 rounded"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const newRule = {
+                                            condition: 'is' as const,
+                                            value: question.options?.[0]?.value || '',
+                                            action: 'jump_to' as const,
+                                            target: allQuestions.find(q => q.id !== question.id)?.id || ''
+                                        };
+                                        setQuestion({ ...question, logic: [...(question.logic || []), newRule] });
+                                    }}
+                                    className="w-full px-3 py-2 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+                                >
+                                    <Plus className="w-4 h-4 inline mr-1" />
+                                    Add Logic Rule
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {question.type === 'true_false' && (
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-3">
@@ -656,10 +750,10 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                         </button>
                     </div>
                 </form>
-            </div>
+            </div >
 
             {/* Preview Column */}
-            <div className="space-y-4">
+            < div className="space-y-4" >
                 <div className="flex items-center gap-2 text-slate-500 mb-2">
                     <Eye className="w-4 h-4" />
                     <span className="text-sm font-medium">Live Preview</span>
@@ -699,7 +793,7 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                         )}
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
