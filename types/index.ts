@@ -241,6 +241,20 @@ export interface QuizSettings {
     };
 }
 
+export interface Integration {
+    id: string;
+    quizId: string;
+    type: string;
+    config: any;
+    isActive: boolean;
+}
+
+export interface HubSpotIntegration {
+    portalId: string;
+    formGuid: string;
+    mappings: { source: string; hubspot: string }[];
+}
+
 export interface Quiz {
     id: string;
     title: string;

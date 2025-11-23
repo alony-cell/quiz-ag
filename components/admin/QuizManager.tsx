@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import LeadFormEditor from '@/components/admin/LeadFormEditor';
 import QuizEditor from '@/components/admin/QuizEditor';
+import HubSpotIntegration from '@/components/admin/HubSpotIntegration';
 import QuestionList from '@/components/admin/QuestionList';
 import DesignEditor from '@/components/admin/DesignEditor';
 import { Quiz, Question, DesignConfig, ThankYouPage, QuizSettings } from '@/types';
@@ -17,7 +18,7 @@ interface QuizManagerProps {
 
 export default function QuizManager({ initialQuiz }: QuizManagerProps) {
     const [quiz, setQuiz] = useState<Quiz>(initialQuiz);
-    const [activeTab, setActiveTab] = useState<'settings' | 'questions' | 'design' | 'outcomes' | 'lead-form'>('questions');
+    const [activeTab, setActiveTab] = useState<'settings' | 'questions' | 'design' | 'outcomes' | 'lead-form' | 'integrations'>('questions');
     const [isSaving, setIsSaving] = useState(false);
     const router = useRouter();
 
@@ -112,6 +113,15 @@ export default function QuizManager({ initialQuiz }: QuizManagerProps) {
                         Lead Form
                     </button>
                     <button
+                        onClick={() => setActiveTab('integrations')}
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'integrations'
+                            ? 'bg-white text-slate-900 shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                            }`}
+                    >
+                        Integrations
+                    </button>
+                    <button
                         onClick={() => setActiveTab('outcomes')}
                         className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'outcomes'
                             ? 'bg-white text-slate-900 shadow-sm'
@@ -134,22 +144,29 @@ export default function QuizManager({ initialQuiz }: QuizManagerProps) {
 
             {/* Content */}
             <div className="min-h-[400px]">
-                {activeTab === 'questions' ? (
+                {activeTab === 'questions' && (
                     <QuestionList
                         questions={quiz.questions || []}
                         design={quiz.design!}
                         onUpdate={handleUpdateQuestions}
                     />
-                ) : activeTab === 'design' ? (
+                )}
+                {activeTab === 'design' && (
                     <DesignEditor quiz={quiz} onUpdate={handleUpdateDesign} />
-                ) : activeTab === 'lead-form' ? (
+                )}
+                {activeTab === 'lead-form' && (
                     <LeadFormEditor quiz={quiz} onUpdate={handleUpdateSettings} />
-                ) : activeTab === 'outcomes' ? (
+                )}
+                {activeTab === 'integrations' && (
+                    <HubSpotIntegration quizId={quiz.id} />
+                )}
+                {activeTab === 'outcomes' && (
                     <ThankYouEditor
                         thankYouPages={quiz.thankYouPages || []}
                         onUpdate={handleUpdateThankYouPages}
                     />
-                ) : (
+                )}
+                {activeTab === 'settings' && (
                     <QuizEditor initialData={quiz} />
                 )}
             </div>
