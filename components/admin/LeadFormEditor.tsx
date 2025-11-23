@@ -190,6 +190,30 @@ export default function LeadFormEditor({ quiz, onUpdate }: LeadFormEditorProps) 
                                                     Required
                                                 </label>
 
+                                                {field.type === 'email' && (
+                                                    <>
+                                                        <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={field.isBusinessEmail || false}
+                                                                onChange={(e) => updateField(index, { isBusinessEmail: e.target.checked })}
+                                                                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                            />
+                                                            Business Only
+                                                        </label>
+
+                                                        <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={field.requiresVerification || false}
+                                                                onChange={(e) => updateField(index, { requiresVerification: e.target.checked })}
+                                                                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                            />
+                                                            Verify Email
+                                                        </label>
+                                                    </>
+                                                )}
+
                                                 <button
                                                     onClick={() => removeField(index)}
                                                     className="ml-auto p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"

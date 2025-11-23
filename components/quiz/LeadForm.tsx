@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { ArrowRight, ChevronDown, Check } from 'lucide-react';
+import { ArrowRight, ChevronDown, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { validateEmail } from '@/app/actions/validation';
+import { isBusinessEmail } from '@/lib/email-utils';
 
 interface LeadFormProps {
     fields?: {
@@ -11,6 +13,8 @@ interface LeadFormProps {
         label: string;
         required: boolean;
         placeholder?: string;
+        isBusinessEmail?: boolean;
+        requiresVerification?: boolean;
     }[];
     onSubmit: (data: Record<string, any>) => void;
     isSubmitting?: boolean;
@@ -68,30 +72,73 @@ export default function LeadForm({ fields = [], onSubmit, isSubmitting }: LeadFo
     const [formData, setFormData] = useState<Record<string, any>>({});
     const [countryCode, setCountryCode] = useState('US');
     const [isCountryOpen, setIsCountryOpen] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [isValidating, setIsValidating] = useState(false);
 
     // Default fields if none provided
     const formFields = fields.length > 0 ? fields : [
-        { id: 'firstName', type: 'text', label: 'First Name', required: false, placeholder: 'Jane' },
-        { id: 'email', type: 'email', label: 'Email Address', required: true, placeholder: 'jane@example.com' },
+        { id: 'firstName', type: 'text' as const, label: 'First Name', required: false, placeholder: 'Jane' },
+        { id: 'email', type: 'email' as const, label: 'Email Address', required: true, placeholder: 'jane@example.com' },
     ];
 
     const selectedCountry = useMemo(() =>
         COUNTRIES.find(c => c.code === countryCode) || COUNTRIES[0],
         [countryCode]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Combine phone with country code if phone field exists
-        const data = { ...formData };
-        if (fields.some(f => f.type === 'phone')) {
-            data.country = countryCode;
-            // Optionally format phone number here
+        setErrors({});
+        setIsValidating(true);
+
+        try {
+            // Validate email fields
+            for (const field of formFields) {
+                if (field.type === 'email' && formData[field.id]) {
+                    const email = formData[field.id];
+
+                    // Business email check
+                    if (field.isBusinessEmail && !isBusinessEmail(email)) {
+                        setErrors(prev => ({ ...prev, [field.id]: 'Please use a business email address' }));
+                        setIsValidating(false);
+                        return;
+                    }
+
+                    // Email verification (MX check)
+                    if (field.requiresVerification) {
+                        const result = await validateEmail(email);
+                        if (!result.valid) {
+                            setErrors(prev => ({ ...prev, [field.id]: result.error || 'Invalid email address' }));
+                            setIsValidating(false);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Combine phone with country code if phone field exists
+            const data = { ...formData };
+            if (fields.some(f => f.type === 'phone')) {
+                data.country = countryCode;
+            }
+
+            setIsValidating(false);
+            onSubmit(data);
+        } catch (error) {
+            console.error('Validation error:', error);
+            setIsValidating(false);
         }
-        onSubmit(data);
     };
 
     const handleChange = (id: string, value: any) => {
         setFormData(prev => ({ ...prev, [id]: value }));
+        // Clear error when user starts typing
+        if (errors[id]) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[id];
+                return newErrors;
+            });
+        }
     };
 
     return (
@@ -189,26 +236,37 @@ export default function LeadForm({ fields = [], onSubmit, isSubmitting }: LeadFo
                                 </label>
                             </div>
                         ) : (
-                            <input
-                                type={field.type}
-                                id={field.id}
-                                value={formData[field.id] || ''}
-                                onChange={(e) => handleChange(field.id, e.target.value)}
-                                className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base p-3 border min-h-[44px]"
-                                placeholder={field.placeholder}
-                                required={field.required}
-                            />
+                            <>
+                                <input
+                                    type={field.type}
+                                    id={field.id}
+                                    value={formData[field.id] || ''}
+                                    onChange={(e) => handleChange(field.id, e.target.value)}
+                                    className={`mt-1 block w-full rounded-lg shadow-sm text-sm sm:text-base p-3 border min-h-[44px] ${errors[field.id]
+                                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                                        : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                                        }`}
+                                    placeholder={field.placeholder}
+                                    required={field.required}
+                                />
+                                {errors[field.id] && (
+                                    <div className="mt-1 flex items-center gap-1 text-red-600 text-sm">
+                                        <AlertCircle className="w-4 h-4" />
+                                        <span>{errors[field.id]}</span>
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 ))}
 
                 <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isValidating}
                     className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm sm:text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
                 >
-                    {isSubmitting ? 'Submitting...' : 'See My Results'}
-                    {!isSubmitting && <ArrowRight className="ml-2 w-5 h-5" />}
+                    {isValidating ? 'Validating...' : isSubmitting ? 'Submitting...' : 'See My Results'}
+                    {!isSubmitting && !isValidating && <ArrowRight className="ml-2 w-5 h-5" />}
                 </button>
             </form>
         </div>

@@ -204,6 +204,8 @@ export interface QuizSettings {
             type: 'email' | 'text' | 'phone' | 'checkbox';
             label: string;
             required: boolean;
+            isBusinessEmail?: boolean;
+            requiresVerification?: boolean;
         }[];
         hiddenFields?: HiddenField[];
     };
