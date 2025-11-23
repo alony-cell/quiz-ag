@@ -255,6 +255,16 @@ export interface HubSpotIntegration {
     mappings: { source: string; hubspot: string }[];
 }
 
+export interface FacebookIntegration {
+    pixelId: string;
+    accessToken: string;
+    testEventCode?: string;
+    events: {
+        lead: boolean;
+        complete: boolean;
+    };
+}
+
 export interface Quiz {
     id: string;
     title: string;

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Question, DesignConfig } from '@/types';
-import { Plus, Edit2, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Edit2, Trash2, GripVertical, Copy } from 'lucide-react';
 import QuestionEditor from './QuestionEditor';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -34,6 +34,24 @@ export default function QuestionList({ questions, design, onUpdate }: QuestionLi
         if (confirm('Are you sure you want to delete this question?')) {
             onUpdate(questions.filter((q) => q.id !== id));
         }
+    };
+
+    const handleDuplicateQuestion = (question: Question) => {
+        const newQuestion = {
+            ...question,
+            id: `q-${Date.now()}`,
+            text: `${question.text} (Copy)`,
+        };
+
+        // Insert after the original question
+        const index = questions.findIndex(q => q.id === question.id);
+        const newQuestions = [...questions];
+        newQuestions.splice(index + 1, 0, newQuestion);
+
+        // Re-index orders
+        const reorderedQuestions = newQuestions.map((q, i) => ({ ...q, order: i + 1 }));
+
+        onUpdate(reorderedQuestions);
     };
 
     return (
@@ -95,8 +113,16 @@ export default function QuestionList({ questions, design, onUpdate }: QuestionLi
                                         <button
                                             onClick={() => setEditingId(question.id)}
                                             className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                            title="Edit Question"
                                         >
                                             <Edit2 className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDuplicateQuestion(question)}
+                                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                            title="Duplicate Question"
+                                        >
+                                            <Copy className="w-4 h-4" />
                                         </button>
                                         <button
                                             onClick={() => handleDeleteQuestion(question.id)}

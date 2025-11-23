@@ -195,3 +195,105 @@ export async function deleteQuiz(id: string) {
         return { success: false, error: 'Failed to delete quiz' };
     }
 }
+
+export async function duplicateQuiz(id: string) {
+    try {
+        // 1. Fetch original quiz
+        const originalQuiz = await db.query.quizzes.findFirst({
+            where: eq(quizzes.id, id),
+            with: {
+                questions: true,
+                thankYouPages: true,
+            },
+        });
+
+        if (!originalQuiz) throw new Error('Quiz not found');
+
+        // 2. Create new quiz data
+        const newTitle = `Copy of ${originalQuiz.title}`;
+        let newSlug = generateSlug(newTitle);
+
+        // Ensure unique slug
+        const existingSlug = await db.query.quizzes.findFirst({
+            where: eq(quizzes.slug, newSlug),
+        });
+        if (existingSlug) {
+            newSlug = `${newSlug}-${Date.now()}`;
+        }
+
+        const newQuizId = crypto.randomUUID();
+
+        // 3. Insert new quiz
+        await db.insert(quizzes).values({
+            id: newQuizId,
+            title: newTitle,
+            slug: newSlug,
+            description: originalQuiz.description,
+            isActive: false, // Start as draft
+            design: originalQuiz.design,
+            settings: originalQuiz.settings,
+        });
+
+        // 4. Copy questions
+        if (originalQuiz.questions && originalQuiz.questions.length > 0) {
+            const questionMap = new Map<string, string>(); // Old ID -> New ID
+
+            // First pass: Create new IDs and insert questions
+            const newQuestions = originalQuiz.questions.map(q => {
+                const newId = crypto.randomUUID();
+                questionMap.set(q.id, newId);
+                return {
+                    id: newId,
+                    quizId: newQuizId,
+                    text: q.text,
+                    description: q.description,
+                    imageUrl: q.imageUrl,
+                    type: q.type,
+                    order: q.order,
+                    options: q.options,
+                    structure: q.structure,
+                    answersLayout: q.answersLayout,
+                    logic: q.logic, // Logic references old IDs, need to update later if possible, or just keep as is (might break if IDs are UUIDs)
+                    isRequired: q.isRequired,
+                    allowBack: q.allowBack,
+                    buttonText: q.buttonText,
+                    isActive: q.isActive,
+                };
+            });
+
+            // Fix logic references in second pass
+            const fixedQuestions = newQuestions.map(q => {
+                if (q.logic && Array.isArray(q.logic)) {
+                    const newLogic = q.logic.map((rule: any) => ({
+                        ...rule,
+                        target: questionMap.get(rule.target) || rule.target
+                    }));
+                    return { ...q, logic: newLogic };
+                }
+                return q;
+            });
+
+            await db.insert(questions).values(fixedQuestions);
+        }
+
+        // 5. Copy thank you pages
+        if (originalQuiz.thankYouPages && originalQuiz.thankYouPages.length > 0) {
+            await db.insert(thankYouPages).values(
+                originalQuiz.thankYouPages.map(p => ({
+                    id: crypto.randomUUID(),
+                    quizId: newQuizId,
+                    title: p.title,
+                    content: p.content,
+                    buttonText: p.buttonText,
+                    buttonUrl: p.buttonUrl,
+                }))
+            );
+        }
+
+        revalidatePath('/admin/quizzes');
+        return { success: true, id: newQuizId };
+    } catch (error) {
+        console.error('Failed to duplicate quiz:', error);
+        return { success: false, error: 'Failed to duplicate quiz' };
+    }
+}

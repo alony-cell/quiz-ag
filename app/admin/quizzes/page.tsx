@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { getQuizzes, deleteQuiz } from '@/app/actions/quiz';
-import { Plus, FileText, MoreVertical, ExternalLink, Edit, BarChart3, Plug } from 'lucide-react';
+import { getQuizzes, deleteQuiz, duplicateQuiz } from '@/app/actions/quiz';
+import { Plus, FileText, MoreVertical, ExternalLink, Edit, BarChart3, Plug, Copy } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
 import DeleteQuizButton from '@/components/admin/DeleteQuizButton';
 
@@ -14,6 +14,15 @@ export default async function QuizzesPage() {
         const id = formData.get('id') as string;
         if (id) {
             await deleteQuiz(id);
+            revalidatePath('/admin/quizzes');
+        }
+    }
+
+    async function handleDuplicate(formData: FormData) {
+        'use server';
+        const id = formData.get('id') as string;
+        if (id) {
+            await duplicateQuiz(id);
             revalidatePath('/admin/quizzes');
         }
     }
@@ -84,6 +93,16 @@ export default async function QuizzesPage() {
                                 <ExternalLink className="w-4 h-4 mr-1.5" />
                                 View
                             </Link>
+                            <form action={handleDuplicate} className="col-span-2">
+                                <input type="hidden" name="id" value={quiz.id} />
+                                <button
+                                    type="submit"
+                                    className="w-full flex items-center justify-center px-3 py-2 text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors min-h-[44px]"
+                                >
+                                    <Copy className="w-4 h-4 mr-1.5" />
+                                    Duplicate
+                                </button>
+                            </form>
                         </div>
                     </div>
                 ))}
@@ -147,7 +166,16 @@ export default async function QuizzesPage() {
                                             >
                                                 <ExternalLink className="w-4 h-4" />
                                             </Link>
-
+                                            <form action={handleDuplicate}>
+                                                <input type="hidden" name="id" value={quiz.id} />
+                                                <button
+                                                    type="submit"
+                                                    className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    title="Duplicate Quiz"
+                                                >
+                                                    <Copy className="w-4 h-4" />
+                                                </button>
+                                            </form>
                                             <Link
                                                 href={`/admin/quizzes/${quiz.id}/analytics`}
                                                 className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -178,6 +206,6 @@ export default async function QuizzesPage() {
                     </table>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

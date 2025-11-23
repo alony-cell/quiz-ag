@@ -4,6 +4,7 @@ import { useState } from 'react';
 import LeadFormEditor from '@/components/admin/LeadFormEditor';
 import QuizEditor from '@/components/admin/QuizEditor';
 import HubSpotIntegration from '@/components/admin/HubSpotIntegration';
+import FacebookIntegration from '@/components/admin/FacebookIntegration';
 import QuestionList from '@/components/admin/QuestionList';
 import DesignEditor from '@/components/admin/DesignEditor';
 import { Quiz, Question, DesignConfig, ThankYouPage, QuizSettings } from '@/types';
@@ -19,6 +20,7 @@ interface QuizManagerProps {
 export default function QuizManager({ initialQuiz }: QuizManagerProps) {
     const [quiz, setQuiz] = useState<Quiz>(initialQuiz);
     const [activeTab, setActiveTab] = useState<'settings' | 'questions' | 'design' | 'outcomes' | 'lead-form' | 'integrations'>('questions');
+    const [integrationTab, setIntegrationTab] = useState<'hubspot' | 'facebook'>('hubspot');
     const [isSaving, setIsSaving] = useState(false);
     const router = useRouter();
 
@@ -158,7 +160,34 @@ export default function QuizManager({ initialQuiz }: QuizManagerProps) {
                     <LeadFormEditor quiz={quiz} onUpdate={handleUpdateSettings} />
                 )}
                 {activeTab === 'integrations' && (
-                    <HubSpotIntegration quizId={quiz.id} quiz={quiz} />
+                    <div className="space-y-6">
+                        <div className="flex space-x-4 border-b border-slate-200 pb-2">
+                            <button
+                                onClick={() => setIntegrationTab('hubspot')}
+                                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${integrationTab === 'hubspot'
+                                    ? 'bg-blue-50 text-blue-600'
+                                    : 'text-slate-600 hover:bg-slate-50'
+                                    }`}
+                            >
+                                HubSpot
+                            </button>
+                            <button
+                                onClick={() => setIntegrationTab('facebook')}
+                                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${integrationTab === 'facebook'
+                                    ? 'bg-blue-50 text-blue-600'
+                                    : 'text-slate-600 hover:bg-slate-50'
+                                    }`}
+                            >
+                                Facebook CAPI
+                            </button>
+                        </div>
+
+                        {integrationTab === 'hubspot' ? (
+                            <HubSpotIntegration quizId={quiz.id} quiz={quiz} />
+                        ) : (
+                            <FacebookIntegration quizId={quiz.id} />
+                        )}
+                    </div>
                 )}
                 {activeTab === 'outcomes' && (
                     <ThankYouEditor

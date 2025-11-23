@@ -2,7 +2,7 @@
 
 import { db } from '@/db';
 import { responses, leads } from '@/db/schema';
-import { syncLeadToIntegrations } from '@/app/actions/integration';
+import { syncLeadToIntegrations, trackQuizCompletion } from '@/app/actions/integration';
 
 export async function submitResponse(data: {
     quizId: string;
@@ -77,6 +77,13 @@ export async function submitResponse(data: {
             answers: data.answers,
             timeTaken: data.timeTaken,
         });
+
+        // 3. Track Completion (e.g. Facebook CAPI)
+        try {
+            await trackQuizCompletion(data.quizId, leadId, data.answers);
+        } catch (trackError) {
+            console.error('Failed to track completion:', trackError);
+        }
 
         return { success: true };
     } catch (error) {
