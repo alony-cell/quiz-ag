@@ -50,6 +50,7 @@ export const leads = pgTable('leads', {
     email: text('email'),
     name: text('name'),
     phone: text('phone'),
+    country: text('country'), // Country code (e.g., US, GB)
     metadata: jsonb('metadata'), // Any extra info
     hiddenData: jsonb('hidden_data'), // UTMs, IP, etc.
     score: integer('score'),

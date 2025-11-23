@@ -12,6 +12,7 @@ export async function submitResponse(data: {
         email?: string;
         name?: string;
         phone?: string;
+        country?: string;
         metadata?: any;
         hiddenData?: any;
         score?: number;
@@ -40,6 +41,7 @@ export async function submitResponse(data: {
                     email: data.lead.email,
                     name: data.lead.name,
                     phone: data.lead.phone,
+                    country: data.lead.country,
                     metadata: data.lead.metadata,
                     hiddenData: data.lead.hiddenData,
                     score: data.lead.score,

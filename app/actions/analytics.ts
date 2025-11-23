@@ -91,10 +91,11 @@ export async function getAllLeads() {
         const allLeads = await db.query.leads.findMany({
             with: {
                 quiz: {
-                    columns: {
-                        title: true,
+                    with: {
+                        questions: true,
                     }
-                }
+                },
+                responses: true,
             },
             orderBy: [desc(leads.createdAt)],
         });

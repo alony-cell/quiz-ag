@@ -139,6 +139,7 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
                 email: data.email,
                 name: data.firstName,
                 phone: data.phone,
+                country: data.country,
                 metadata: data,
                 hiddenData,
                 score,
@@ -233,8 +234,8 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
 
     // Main quiz view
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8" style={{ backgroundColor: design.colors.background, backgroundImage: design.colors.gradient }} {...fontStyle}>
-            <div className="max-w-2xl mx-auto px-2 sm:px-0" style={fontStyle}>
+        <div className="min-h-screen flex items-start justify-center p-4 sm:p-6 lg:p-8 pt-8 md:pt-12" style={{ backgroundColor: design.colors.background, backgroundImage: design.colors.gradient }} {...fontStyle}>
+            <div className="max-w-2xl mx-auto px-2 sm:px-0 w-full" style={fontStyle}>
                 {/* Progress Bar */}
                 <div className="mb-6 sm:mb-8">
                     <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
