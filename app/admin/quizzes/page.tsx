@@ -75,13 +75,7 @@ export default async function QuizzesPage() {
                                 <BarChart3 className="w-4 h-4 mr-1.5" />
                                 Analytics
                             </Link>
-                            <Link
-                                href={`/admin/quizzes/${quiz.id}/integrations`}
-                                className="flex items-center justify-center px-3 py-2 text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors min-h-[44px]"
-                            >
-                                <Plug className="w-4 h-4 mr-1.5" />
-                                Integrations
-                            </Link>
+
                             <Link
                                 href={`/quiz/${quiz.slug}`}
                                 target="_blank"
@@ -153,13 +147,7 @@ export default async function QuizzesPage() {
                                             >
                                                 <ExternalLink className="w-4 h-4" />
                                             </Link>
-                                            <Link
-                                                href={`/admin/quizzes/${quiz.id}/integrations`}
-                                                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                title="Integrations"
-                                            >
-                                                <Plug className="w-4 h-4" />
-                                            </Link>
+
                                             <Link
                                                 href={`/admin/quizzes/${quiz.id}/analytics`}
                                                 className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
