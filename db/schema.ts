@@ -10,6 +10,7 @@ export const quizzes = pgTable('quizzes', {
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     isActive: boolean('is_active').default(true).notNull(),
     design: jsonb('design'), // Store design config as JSON
+    settings: jsonb('settings'), // Store quiz settings (lead capture, etc.)
 });
 
 export const questions = pgTable('questions', {

@@ -554,9 +554,17 @@ export default function QuestionEditor({ initialQuestion, design, onSave, onCanc
                     className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm min-h-[600px] flex items-center justify-center p-8"
                     style={{
                         backgroundColor: design?.colors.background || '#f8fafc',
-                        backgroundImage: (design?.colors.gradientStart && design?.colors.gradientEnd)
+                        backgroundImage: design?.colors.gradient || ((design?.colors.gradientStart && design?.colors.gradientEnd)
                             ? `linear-gradient(to bottom right, ${design.colors.gradientStart}, ${design.colors.gradientEnd})`
-                            : undefined
+                            : undefined),
+                        fontFamily: design?.typography.fontFamily === 'inter' ? 'var(--font-inter)' :
+                            design?.typography.fontFamily === 'outfit' ? 'var(--font-outfit)' :
+                                design?.typography.fontFamily === 'poppins' ? 'Poppins, sans-serif' :
+                                    design?.typography.fontFamily === 'playfair' ? 'Playfair Display, serif' :
+                                        design?.typography.fontFamily === 'lora' ? 'Lora, serif' :
+                                            design?.typography.fontFamily === 'roboto' ? 'Roboto, sans-serif' :
+                                                design?.typography.fontFamily,
+                        color: design?.colors.text
                     }}
                 >
                     {/* Phone/Device Frame Simulation (Optional, keeping it simple for now) */}

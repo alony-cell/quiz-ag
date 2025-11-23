@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import LeadFormEditor from '@/components/admin/LeadFormEditor';
 import QuizEditor from '@/components/admin/QuizEditor';
 import QuestionList from '@/components/admin/QuestionList';
 import DesignEditor from '@/components/admin/DesignEditor';
-import { Quiz, Question, DesignConfig, ThankYouPage } from '@/types';
+import { Quiz, Question, DesignConfig, ThankYouPage, QuizSettings } from '@/types';
 import { saveQuiz } from '@/app/actions/quiz';
 import { Save, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -16,7 +17,7 @@ interface QuizManagerProps {
 
 export default function QuizManager({ initialQuiz }: QuizManagerProps) {
     const [quiz, setQuiz] = useState<Quiz>(initialQuiz);
-    const [activeTab, setActiveTab] = useState<'settings' | 'questions' | 'design' | 'outcomes'>('questions');
+    const [activeTab, setActiveTab] = useState<'settings' | 'questions' | 'design' | 'outcomes' | 'lead-form'>('questions');
     const [isSaving, setIsSaving] = useState(false);
     const router = useRouter();
 
@@ -30,6 +31,10 @@ export default function QuizManager({ initialQuiz }: QuizManagerProps) {
 
     const handleUpdateThankYouPages = (thankYouPages: ThankYouPage[]) => {
         setQuiz({ ...quiz, thankYouPages });
+    };
+
+    const handleUpdateSettings = (settings: QuizSettings) => {
+        setQuiz({ ...quiz, settings });
     };
 
     const handleSave = async () => {
@@ -76,40 +81,50 @@ export default function QuizManager({ initialQuiz }: QuizManagerProps) {
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-slate-200 -mx-4 sm:mx-0 px-4 sm:px-0">
-                <nav className="-mb-px flex space-x-6 sm:space-x-8 overflow-x-auto scrollbar-hide">
+            {/* Tabs */}
+            <div className="flex overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
+                <nav className="flex p-1 space-x-1 bg-slate-100 rounded-xl">
                     <button
                         onClick={() => setActiveTab('questions')}
-                        className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors min-h-[44px] flex items-center ${activeTab === 'questions'
-                            ? 'border-blue-500 text-blue-600'
-                            : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'questions'
+                            ? 'bg-white text-slate-900 shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                             }`}
                     >
                         Questions ({quiz.questions?.length || 0})
                     </button>
                     <button
                         onClick={() => setActiveTab('design')}
-                        className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors min-h-[44px] flex items-center ${activeTab === 'design'
-                            ? 'border-blue-500 text-blue-600'
-                            : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'design'
+                            ? 'bg-white text-slate-900 shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                             }`}
                     >
                         Design
                     </button>
                     <button
+                        onClick={() => setActiveTab('lead-form')}
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'lead-form'
+                            ? 'bg-white text-slate-900 shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                            }`}
+                    >
+                        Lead Form
+                    </button>
+                    <button
                         onClick={() => setActiveTab('outcomes')}
-                        className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors min-h-[44px] flex items-center ${activeTab === 'outcomes'
-                            ? 'border-blue-500 text-blue-600'
-                            : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'outcomes'
+                            ? 'bg-white text-slate-900 shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                             }`}
                     >
                         Outcomes ({quiz.thankYouPages?.length || 0})
                     </button>
                     <button
                         onClick={() => setActiveTab('settings')}
-                        className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors min-h-[44px] flex items-center ${activeTab === 'settings'
-                            ? 'border-blue-500 text-blue-600'
-                            : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'settings'
+                            ? 'bg-white text-slate-900 shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                             }`}
                     >
                         Settings
@@ -127,6 +142,8 @@ export default function QuizManager({ initialQuiz }: QuizManagerProps) {
                     />
                 ) : activeTab === 'design' ? (
                     <DesignEditor quiz={quiz} onUpdate={handleUpdateDesign} />
+                ) : activeTab === 'lead-form' ? (
+                    <LeadFormEditor quiz={quiz} onUpdate={handleUpdateSettings} />
                 ) : activeTab === 'outcomes' ? (
                     <ThankYouEditor
                         thankYouPages={quiz.thankYouPages || []}

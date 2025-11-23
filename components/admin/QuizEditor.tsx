@@ -6,8 +6,6 @@ import { Save, ArrowLeft, Loader2, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Quiz, Question } from '@/types';
 import { saveQuiz } from '@/app/actions/quiz';
-import QuestionEditor from '@/components/admin/QuestionEditor';
-
 interface QuizEditorProps {
     initialData?: Partial<Quiz>;
     isNew?: boolean;
@@ -16,7 +14,6 @@ interface QuizEditorProps {
 export default function QuizEditor({ initialData, isNew = false }: QuizEditorProps) {
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
-    const [questions, setQuestions] = useState<Question[]>(initialData?.questions || []);
     const [formData, setFormData] = useState<Partial<Quiz>>({
         title: '',
         slug: '',
@@ -33,7 +30,7 @@ export default function QuizEditor({ initialData, isNew = false }: QuizEditorPro
         try {
             const result = await saveQuiz({
                 ...formData,
-                questions,
+                questions: initialData?.questions || [], // Pass existing questions to prevent deletion
             });
             if (result.success && result.quizId) {
                 router.push(`/admin/quizzes/${result.quizId}`);
@@ -44,35 +41,6 @@ export default function QuizEditor({ initialData, isNew = false }: QuizEditorPro
         } finally {
             setIsSaving(false);
         }
-    };
-
-    const addQuestion = () => {
-        setQuestions(prev => [
-            ...prev,
-            {
-                id: crypto.randomUUID(),
-                quizId: formData.id || '',
-                text: '',
-                description: '',
-                imageUrl: '',
-                type: 'multiple_choice',
-                order: prev.length,
-                options: [],
-                structure: [],
-                isRequired: true,
-                isActive: true,
-                allowBack: false,
-                buttonText: '',
-            } as Question,
-        ]);
-    };
-
-    const updateQuestion = (index: number, updated: Partial<Question>) => {
-        setQuestions(prev => {
-            const copy = [...prev];
-            copy[index] = { ...copy[index], ...updated } as Question;
-            return copy;
-        });
     };
 
     return (
@@ -145,27 +113,6 @@ export default function QuizEditor({ initialData, isNew = false }: QuizEditorPro
                             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
                         <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">Active (visible to public)</label>
-                    </div>
-
-                    {/* Questions Section */}
-                    <div className="space-y-6">
-                        <h2 className="text-xl font-semibold text-gray-800">Questions</h2>
-                        {questions.map((q, idx) => (
-                            <QuestionEditor
-                                key={q.id}
-                                initialQuestion={q}
-                                onSave={updated => updateQuestion(idx, updated)}
-                                onCancel={() => { }}
-                            />
-                        ))}
-                        <button
-                            type="button"
-                            onClick={addQuestion}
-                            className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
-                        >
-                            <Plus className="w-4 h-4 mr-1" />
-                            Add Question
-                        </button>
                     </div>
                 </form>
             </div>

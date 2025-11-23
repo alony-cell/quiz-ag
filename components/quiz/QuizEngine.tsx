@@ -100,12 +100,36 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
 
         // Collect Hidden Data
         const hiddenData: Record<string, any> = {};
-        searchParams.forEach((value, key) => {
-            if (key.startsWith('utm_') || key === 'ref') {
-                hiddenData[key] = value;
-            }
-        });
-        hiddenData.userAgent = navigator.userAgent;
+
+        if (quiz.settings?.leadCapture?.hiddenFields && quiz.settings.leadCapture.hiddenFields.length > 0) {
+            quiz.settings.leadCapture.hiddenFields.forEach(field => {
+                try {
+                    if (field.sourceType === 'url_param' && field.sourceKey) {
+                        const val = searchParams.get(field.sourceKey);
+                        if (val) hiddenData[field.name] = val;
+                    } else if (field.sourceType === 'constant' && field.constantValue) {
+                        hiddenData[field.name] = field.constantValue;
+                    } else if (field.sourceType === 'referrer') {
+                        hiddenData[field.name] = document.referrer;
+                    } else if (field.sourceType === 'user_agent') {
+                        hiddenData[field.name] = navigator.userAgent;
+                    } else if (field.sourceType === 'cookie' && field.sourceKey) {
+                        const match = document.cookie.match(new RegExp('(^| )' + field.sourceKey + '=([^;]+)'));
+                        if (match) hiddenData[field.name] = match[2];
+                    }
+                } catch (e) {
+                    console.error(`Failed to capture hidden field ${field.name}:`, e);
+                }
+            });
+        } else {
+            // Fallback to legacy behavior
+            searchParams.forEach((value, key) => {
+                if (key.startsWith('utm_') || key === 'ref') {
+                    hiddenData[key] = value;
+                }
+            });
+            hiddenData.userAgent = navigator.userAgent;
+        }
 
         await submitResponse({
             quizId: quiz.id,

@@ -14,13 +14,13 @@ export default async function LeadsPage() {
                     <p className="text-slate-500 mt-1">View and manage leads captured from your quizzes.</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <span className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 shadow-sm">
+                    <span className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-600 shadow-sm">
                         Total Leads: {leads.length}
                     </span>
                 </div>
             </div>
 
-            <div className="glass-panel rounded-2xl overflow-hidden">
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>

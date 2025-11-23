@@ -27,7 +27,7 @@ export default async function QuizzesPage() {
                 </div>
                 <Link
                     href="/admin/quizzes/new"
-                    className="flex items-center justify-center px-5 py-2.5 text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all hover:scale-105 min-h-[44px] text-sm sm:text-base"
+                    className="flex items-center justify-center px-5 py-2.5 text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[44px] text-sm font-medium"
                 >
                     <Plus className="w-5 h-5 mr-2" />
                     Create New Quiz
@@ -37,7 +37,7 @@ export default async function QuizzesPage() {
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
                 {quizzes.map((quiz) => (
-                    <div key={quiz.id} className="glass-panel rounded-2xl p-4">
+                    <div key={quiz.id} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
                         <div className="flex items-start space-x-3 mb-3">
                             <div className="p-2 bg-blue-50 rounded-lg text-blue-600 flex-shrink-0">
                                 <FileText className="w-5 h-5" />
@@ -101,7 +101,7 @@ export default async function QuizzesPage() {
             </div>
 
             {/* Desktop Table View */}
-            <div className="hidden md:block glass-panel rounded-2xl overflow-hidden">
+            <div className="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>

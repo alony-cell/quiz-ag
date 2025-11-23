@@ -184,6 +184,14 @@ export interface ThankYouPage {
     imageUrl?: string;
 }
 
+export interface HiddenField {
+    id: string;
+    name: string;
+    sourceType: 'url_param' | 'referrer' | 'user_agent' | 'ip_address' | 'cookie' | 'constant';
+    sourceKey?: string;
+    constantValue?: string;
+}
+
 export interface QuizSettings {
     general: {
         showProgressBar: boolean;
@@ -197,6 +205,7 @@ export interface QuizSettings {
             label: string;
             required: boolean;
         }[];
+        hiddenFields?: HiddenField[];
     };
 }
 

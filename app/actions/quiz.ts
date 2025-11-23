@@ -85,15 +85,17 @@ export async function saveQuiz(quizData: Partial<Quiz> & { questions: Question[]
             slug: slug,
             description: quizData.description,
             design: quizData.design,
+            settings: quizData.settings,
             isActive: quizData.isActive ?? true,
             updatedAt: new Date(),
         }).onConflictDoUpdate({
             target: quizzes.id,
             set: {
                 title: quizData.title,
-                slug: slug, // Update slug if title changes? Maybe optional. For now, yes.
+                slug: slug,
                 description: quizData.description,
                 design: quizData.design,
+                settings: quizData.settings,
                 isActive: quizData.isActive,
                 updatedAt: new Date(),
             },

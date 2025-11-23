@@ -69,7 +69,7 @@ export default function ThankYouEditor({ thankYouPages, onUpdate }: ThankYouEdit
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-slate-900 font-heading">Outcome Pages</h3>
+                <h3 className="text-lg font-bold text-slate-900 font-heading">Outcomes & Rules</h3>
                 {!isCreating && !editingId && (
                     <button
                         onClick={handleStartCreate}
@@ -115,23 +115,24 @@ export default function ThankYouEditor({ thankYouPages, onUpdate }: ThankYouEdit
                                                 placeholder="Description of the outcome..."
                                             />
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-1">Min Score</label>
+
+                                        {/* Rules Section */}
+                                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                            <h4 className="text-sm font-medium text-slate-900 mb-3">Display Rules</h4>
+                                            <div className="flex items-center gap-3 text-sm text-slate-600">
+                                                <span>Show this outcome if score is between</span>
                                                 <input
                                                     type="number"
                                                     value={editForm.scoreRangeMin || 0}
                                                     onChange={(e) => setEditForm({ ...editForm, scoreRangeMin: parseInt(e.target.value) || 0 })}
-                                                    className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2.5 border"
+                                                    className="w-20 rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border text-center"
                                                 />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-1">Max Score</label>
+                                                <span>and</span>
                                                 <input
                                                     type="number"
                                                     value={editForm.scoreRangeMax || 0}
                                                     onChange={(e) => setEditForm({ ...editForm, scoreRangeMax: parseInt(e.target.value) || 0 })}
-                                                    className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2.5 border"
+                                                    className="w-20 rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border text-center"
                                                 />
                                             </div>
                                         </div>

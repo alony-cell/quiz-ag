@@ -24,7 +24,7 @@ export default async function DashboardPage() {
                 </div>
                 <Link
                     href="/admin/quizzes/new"
-                    className="flex items-center px-5 py-2.5 text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all hover:scale-105"
+                    className="flex items-center px-5 py-2.5 text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] text-sm font-medium"
                 >
                     <Plus className="w-5 h-5 mr-2" />
                     Create New Quiz
@@ -34,7 +34,7 @@ export default async function DashboardPage() {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 {dashboardStats.map((stat) => (
-                    <div key={stat.label} className="glass-card p-6 rounded-2xl">
+                    <div key={stat.label} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                         <div className="flex items-start justify-between">
                             <div>
                                 <p className="text-sm font-medium text-slate-500">{stat.label}</p>
@@ -54,8 +54,8 @@ export default async function DashboardPage() {
             </div>
 
             {/* Recent Quizzes */}
-            <div className="glass-panel rounded-2xl overflow-hidden">
-                <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center">
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <h3 className="text-lg font-bold text-slate-900 font-heading">Recent Quizzes</h3>
                     <Link href="/admin/quizzes" className="text-sm font-medium text-blue-600 hover:text-blue-700">
                         View All
