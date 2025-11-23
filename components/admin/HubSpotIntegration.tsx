@@ -24,7 +24,7 @@ export default function HubSpotIntegration({ quizId }: { quizId: string }) {
             if (hubspot) {
                 setIntegrationId(hubspot.id);
                 if (hubspot.config) {
-                    const cfg: HubSpotIntegration = hubspot.config;
+                    const cfg = hubspot.config as HubSpotIntegration;
                     setPortalId(cfg.portalId ?? '');
                     setFormGuid(cfg.formGuid ?? '');
                     setMappings(cfg.mappings ?? []);
