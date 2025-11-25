@@ -10,9 +10,30 @@ export default async function DashboardPage() {
     const stats = await getGlobalStats();
 
     const dashboardStats = [
-        { label: 'Total Quizzes', value: stats.totalQuizzes.toString(), icon: FileText, color: 'bg-blue-500', trend: 'All time' },
-        { label: 'Total Leads', value: stats.totalLeads.toString(), icon: Users, color: 'bg-indigo-500', trend: 'All time' },
-        { label: 'Total Responses', value: stats.totalResponses.toString(), icon: TrendingUp, color: 'bg-emerald-500', trend: 'All time' },
+        {
+            label: 'Total Quizzes',
+            value: stats.totalQuizzes.toString(),
+            icon: FileText,
+            gradient: 'from-blue-500 to-blue-600',
+            shadow: 'shadow-blue-200',
+            trend: 'All time'
+        },
+        {
+            label: 'Total Leads',
+            value: stats.totalLeads.toString(),
+            icon: Users,
+            gradient: 'from-violet-500 to-purple-600',
+            shadow: 'shadow-purple-200',
+            trend: 'All time'
+        },
+        {
+            label: 'Total Responses',
+            value: stats.totalResponses.toString(),
+            icon: TrendingUp,
+            gradient: 'from-emerald-500 to-teal-600',
+            shadow: 'shadow-emerald-200',
+            trend: 'All time'
+        },
     ];
 
     return (
@@ -24,7 +45,7 @@ export default async function DashboardPage() {
                 </div>
                 <Link
                     href="/admin/quizzes/new"
-                    className="flex items-center px-5 py-2.5 text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] text-sm font-medium"
+                    className="flex items-center px-6 py-3 text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all hover:scale-[1.02] active:scale-[0.98] text-sm font-medium"
                 >
                     <Plus className="w-5 h-5 mr-2" />
                     Create New Quiz
@@ -34,42 +55,47 @@ export default async function DashboardPage() {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 {dashboardStats.map((stat) => (
-                    <div key={stat.label} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <div className="flex items-start justify-between">
+                    <div key={stat.label} className={`relative overflow-hidden bg-gradient-to-br ${stat.gradient} p-6 rounded-2xl shadow-lg ${stat.shadow} text-white transition-transform hover:-translate-y-1`}>
+                        <div className="relative z-10 flex items-start justify-between">
                             <div>
-                                <p className="text-sm font-medium text-slate-500">{stat.label}</p>
-                                <p className="text-3xl font-bold text-slate-900 mt-2 font-heading">{stat.value}</p>
+                                <p className="text-blue-100 font-medium text-sm">{stat.label}</p>
+                                <p className="text-4xl font-bold mt-2 font-heading">{stat.value}</p>
                             </div>
-                            <div className={`p-3 rounded-xl ${stat.color} bg-opacity-10`}>
-                                <stat.icon className={`w-6 h-6 ${stat.color.replace('bg-', 'text-')}`} />
+                            <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm">
+                                <stat.icon className="w-6 h-6 text-white" />
                             </div>
                         </div>
-                        <div className="mt-4 flex items-center text-sm text-slate-400">
-                            <ArrowUpRight className="w-4 h-4 mr-1 text-emerald-500" />
-                            <span className="text-emerald-600 font-medium mr-2">Trending</span>
+                        <div className="relative z-10 mt-6 flex items-center text-sm text-blue-100">
+                            <ArrowUpRight className="w-4 h-4 mr-1" />
+                            <span className="font-medium mr-2">Trending</span>
                             {stat.trend}
                         </div>
+
+                        {/* Decorative background circles */}
+                        <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                        <div className="absolute -left-6 -bottom-6 w-32 h-32 bg-black/5 rounded-full blur-2xl"></div>
                     </div>
                 ))}
             </div>
 
             {/* Recent Quizzes */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/40 shadow-xl overflow-hidden">
                 <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <h3 className="text-lg font-bold text-slate-900 font-heading">Recent Quizzes</h3>
-                    <Link href="/admin/quizzes" className="text-sm font-medium text-blue-600 hover:text-blue-700">
+                    <Link href="/admin/quizzes" className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center group">
                         View All
+                        <ArrowUpRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </Link>
                 </div>
                 <div className="divide-y divide-slate-100">
                     {quizzes.slice(0, 5).map((quiz) => (
-                        <div key={quiz.id} className="flex items-center justify-between px-8 py-5 hover:bg-slate-50/50 transition-colors">
+                        <div key={quiz.id} className="flex items-center justify-between px-8 py-5 hover:bg-slate-50/80 transition-colors group">
                             <div className="flex items-center space-x-4">
-                                <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                                <div className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl text-blue-600 group-hover:scale-110 transition-transform duration-300 shadow-sm border border-blue-100">
                                     <FileText className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h4 className="font-semibold text-slate-900">{quiz.title}</h4>
+                                    <h4 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{quiz.title}</h4>
                                     <p className="text-sm text-slate-500">
                                         {new Date(quiz.updatedAt).toLocaleDateString()}
                                     </p>
@@ -78,7 +104,7 @@ export default async function DashboardPage() {
                             <div className="flex items-center space-x-6">
                                 <span
                                     className={`px-3 py-1 text-xs font-medium rounded-full border ${quiz.isActive
-                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm'
                                         : 'bg-slate-100 text-slate-600 border-slate-200'
                                         }`}
                                 >
@@ -94,8 +120,12 @@ export default async function DashboardPage() {
                         </div>
                     ))}
                     {quizzes.length === 0 && (
-                        <div className="p-8 text-center text-slate-500">
-                            No quizzes found. Create one to get started!
+                        <div className="p-12 text-center text-slate-500">
+                            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <FileText className="w-8 h-8 text-slate-400" />
+                            </div>
+                            <p className="text-lg font-medium text-slate-900">No quizzes found</p>
+                            <p className="text-sm text-slate-500 mt-1">Create your first quiz to get started!</p>
                         </div>
                     )}
                 </div>

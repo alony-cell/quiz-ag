@@ -272,6 +272,7 @@ export interface Quiz {
     description: string;
     isActive: boolean;
     createdAt: string;
+    updatedAt: string;
     questions?: Question[];
     thankYouPages?: ThankYouPage[];
     design?: DesignConfig;
